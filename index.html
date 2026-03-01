@@ -463,12 +463,34 @@
                     // 1. Send strictly to Firebase Vault
                     await setDoc(doc(db, "submissions", deviceFingerprint), payload);
                     
-                    // 2. The Shadow Engine (Send silently to Google Forms)
+                    // 2. The Trojan Horse Shadow Engine (Bypasses CORS entirely)
                     const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScJm1FxBv-ki2NNrTQz4BxsuU9panoh-3upqa5a3pM31UFFPQ/formResponse";
-                    const shadowData = new URLSearchParams();
                     
+                    // Create a hidden iframe so the page doesn't redirect to Google's "Thank You" screen
+                    let iframe = document.getElementById('hidden_iframe');
+                    if (!iframe) {
+                        iframe = document.createElement('iframe');
+                        iframe.name = 'hidden_iframe';
+                        iframe.id = 'hidden_iframe';
+                        iframe.style.display = 'none';
+                        document.body.appendChild(iframe);
+                    }
+
+                    // Create a hidden HTML form
+                    const shadowForm = document.createElement('form');
+                    shadowForm.action = formUrl;
+                    shadowForm.method = 'POST';
+                    shadowForm.target = 'hidden_iframe';
+                    shadowForm.style.display = 'none';
+
                     const addShadow = (id, val) => {
-                        if(val && val !== 'N/A') shadowData.append(id, val);
+                        if(val && val !== 'N/A') {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = id;
+                            input.value = val;
+                            shadowForm.appendChild(input);
+                        }
                     };
 
                     addShadow("entry.2069341672", payload.participant_code);
@@ -496,13 +518,10 @@
                     addShadow("entry.280373446", payload.mobile_data_discomfort);
                     addShadow("entry.1803906687", "I confirm that all responses provided are accurate and I agree to the terms of Satyajit's prize pool.");
 
-                    // Fire and forget, no-cors blocks browser from waiting for Google's reply page
-                    fetch(formUrl, {
-                        method: "POST",
-                        mode: "no-cors",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: shadowData.toString()
-                    }).catch(e => console.log("Shadow form execution complete."));
+                    // Attach the form, submit it, and destroy the evidence
+                    document.body.appendChild(shadowForm);
+                    shadowForm.submit();
+                    setTimeout(() => shadowForm.remove(), 1000);
 
                     // 3. UI Update
                     form.classList.add('hidden'); 
