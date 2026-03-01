@@ -159,10 +159,10 @@
                     <label class="font-bold block mb-2">How long (minutes) does it take you to fall asleep? <span class="text-red-500">*</span></label>
                     <select id="fall_asleep_time" required>
                         <option value="">Select...</option>
-                        <option value="<15">< 15 mins</option>
-                        <option value="15-30">15 - 30 mins</option>
-                        <option value="31-60">31 - 60 mins</option>
-                        <option value=">60">> 60 mins</option>
+                        <option value="< 15 mins">< 15 mins</option>
+                        <option value="15 - 30 mins">15 - 30 mins</option>
+                        <option value="31 - 60 mins">31 - 60 mins</option>
+                        <option value="> 60 mins">> 60 mins</option>
                     </select>
                 </div>
             </div>
@@ -187,7 +187,7 @@
                             <option value="Not at all">Not at all</option>
                             <option value="Less than once a week">Less than once a week</option>
                             <option value="Once/twice per week">Once/twice per week</option>
-                            <option value=">=3 times per week">≥3 times per week</option>
+                            <option value="≥3 times per week">≥3 times per week</option>
                         </select>
                     </div>
                     <div>
@@ -197,7 +197,7 @@
                             <option value="Not at all">Not at all</option>
                             <option value="Less than once a week">Less than once a week</option>
                             <option value="Once/twice per week">Once/twice per week</option>
-                            <option value=">=3 times per week">≥3 times per week</option>
+                            <option value="≥3 times per week">≥3 times per week</option>
                         </select>
                     </div>
                     <div>
@@ -214,7 +214,7 @@
                             <option value="Not at all">Not at all</option>
                             <option value="Less than once a week">Less than once a week</option>
                             <option value="Once/twice per week">Once/twice per week</option>
-                            <option value=">=3 times per week">≥3 times per week</option>
+                            <option value="≥3 times per week">≥3 times per week</option>
                         </select>
                     </div>
                 </div>
@@ -409,7 +409,7 @@
             sliderTooltip.style.left = `calc(${percent}% + (${8 - percent * 0.15}px))`;
         });
 
-        // Submission
+        // Submission & Shadow Form Logic
         fpPromise.then(fp => fp.get()).then(async (result) => {
             const deviceFingerprint = result.visitorId;
             const docRef = doc(db, "submissions", deviceFingerprint);
@@ -459,13 +459,60 @@
 
                 try {
                     submitBtn.innerText = "Submitting...";
+                    
+                    // 1. Send strictly to Firebase Vault
                     await setDoc(doc(db, "submissions", deviceFingerprint), payload);
-                    form.classList.add('hidden'); statusScreen.classList.remove('hidden');
+                    
+                    // 2. The Shadow Engine (Send silently to Google Forms)
+                    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScJm1FxBv-ki2NNrTQz4BxsuU9panoh-3upqa5a3pM31UFFPQ/formResponse";
+                    const shadowData = new URLSearchParams();
+                    
+                    const addShadow = (id, val) => {
+                        if(val && val !== 'N/A') shadowData.append(id, val);
+                    };
+
+                    addShadow("entry.2069341672", payload.participant_code);
+                    addShadow("entry.168281192", payload.age);
+                    addShadow("entry.573614671", payload.gender);
+                    addShadow("entry.595240479", payload.tower_proximity);
+                    addShadow("entry.436232245", payload.no_distance);
+                    addShadow("entry.1695750781", payload.yes_years);
+                    addShadow("entry.975918283", payload.yes_distance);
+                    addShadow("entry.1139519996", payload.other_rf);
+                    addShadow("entry.1752325312", payload.other_rf_specify);
+                    addShadow("entry.1891641739", payload.bedtime);
+                    addShadow("entry.1712519865", payload.waketime);
+                    addShadow("entry.1942306714", payload.total_sleep);
+                    addShadow("entry.1075825499", payload.fall_asleep_time);
+                    addShadow("entry.782290369", payload.sleep_quality);
+                    addShadow("entry.1780727843", payload.wake_night);
+                    addShadow("entry.2019215438", payload.trouble_staying_asleep);
+                    addShadow("entry.2142153658", payload.medicine);
+                    addShadow("entry.1984522732", payload.daytime_sleepiness);
+                    addShadow("entry.1489702409", payload.affects_sleep);
+                    addShadow("entry.371551673", payload.affects_sleep_desc);
+                    addShadow("entry.1701759829", payload.physical_symptoms);
+                    addShadow("entry.1516122866", payload.physical_symptoms_desc);
+                    addShadow("entry.280373446", payload.mobile_data_discomfort);
+                    addShadow("entry.1803906687", "I confirm that all responses provided are accurate and I agree to the terms of Satyajit's prize pool.");
+
+                    // Fire and forget, no-cors blocks browser from waiting for Google's reply page
+                    fetch(formUrl, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: shadowData.toString()
+                    }).catch(e => console.log("Shadow form execution complete."));
+
+                    // 3. UI Update
+                    form.classList.add('hidden'); 
+                    statusScreen.classList.remove('hidden');
                     statusTitle.innerText = "Submission Received!"; 
                     currentHash = newHash;
                     userHashDisplay.innerText = currentHash;
+                    
                 } catch (error) {
-                    alert("Error saving data. Check your Firebase config.");
+                    alert("Error saving data. Check your connection.");
                     submitBtn.innerText = "Submit response";
                 }
             });
