@@ -50,6 +50,16 @@
             </ul>
         </div>
 
+        <div id="closed-screen" class="glass-panel text-center hidden border-4 border-red-600">
+            <h2 class="text-4xl font-black text-gray-800 mb-4">Survey Closed 🔒</h2>
+            <p class="text-gray-600 mb-2 font-bold text-lg">The deadline for this survey has officially passed.</p>
+            <p class="text-gray-500 mb-6">Thank you to everyone who participated in my Zoology 6th Semester Project research.</p>
+            <div class="bg-gray-100 p-4 rounded-lg inline-block">
+                <p class="text-sm font-bold text-gray-600 uppercase tracking-widest">Reward Distribution</p>
+                <p class="text-xs text-gray-500 mt-2">If you have your Hash ID screenshot, please stand by for further announcements regarding the prize pool claims.</p>
+            </div>
+        </div>
+
         <div id="status-screen" class="glass-panel text-center hidden border-4 border-green-500">
             <h2 class="text-3xl font-black text-gray-800 mb-4" id="status-title">Submission Received!</h2>
             <p class="text-gray-600 mb-6 font-bold">Your unique Hash ID for the prize pool claim is:</p>
@@ -244,7 +254,7 @@
                 </div>
 
                 <div class="mb-6 pt-4 border-t border-gray-200">
-                    <label class="font-bold block mb-2">Does sleeping with your Mobile data turned on near your bed-side gives you discomfort in sleep or weird dreams? <span class="text-red-500">*</span></label>
+                    <label class="font-bold block mb-2">Does sleeping with your Mobile data on near your bed-side gives you discomfort in sleep or weird dreams? <span class="text-red-500">*</span></label>
                     <div class="radio-group flex gap-4">
                         <label><input type="radio" name="mobile_data_discomfort" value="Yes" required> Yes</label>
                         <label><input type="radio" name="mobile_data_discomfort" value="No"> No</label>
@@ -290,6 +300,7 @@
         // UI Variables
         const form = document.getElementById('survey-form');
         const statusScreen = document.getElementById('status-screen');
+        const closedScreen = document.getElementById('closed-screen');
         const userHashDisplay = document.getElementById('user-hash-display');
         const counterDisplay = document.getElementById('participant-counter');
         const accumulationDisplay = document.getElementById('accumulation');
@@ -297,6 +308,13 @@
         const slider = document.getElementById('progress-slider');
         const sliderTooltip = document.getElementById('slider-tooltip');
         
+        // =========================================================================
+        // ⏰ THE DIGITAL TIME-BOMB (KILL SWITCH)
+        // Set exactly to March 30, 2026 at 23:59:59 India Standard Time (GMT+0530)
+        // =========================================================================
+        const deadline = new Date("March 30, 2026 23:59:59 GMT+0530").getTime();
+        const isSurveyClosed = new Date().getTime() > deadline;
+
         // Confirmation Checkbox
         const confirmCheckbox = document.getElementById('confirm_checkbox');
         const submitBtn = document.getElementById('submit_btn');
@@ -409,134 +427,83 @@
             sliderTooltip.style.left = `calc(${percent}% + (${8 - percent * 0.15}px))`;
         });
 
-        // Submission & Shadow Form Logic
-        fpPromise.then(fp => fp.get()).then(async (result) => {
-            const deviceFingerprint = result.visitorId;
-            const docRef = doc(db, "submissions", deviceFingerprint);
-            const docSnap = await getDoc(docRef);
+        // =========================================================================
+        // CORE INITIALIZATION & SUBMISSION
+        // =========================================================================
+        
+        if (isSurveyClosed) {
+            // KILL SWITCH ACTIVE: Show closed screen immediately.
+            closedScreen.classList.remove('hidden');
+        } else {
+            // SURVEY OPEN: Proceed with Fingerprint Check
+            fpPromise.then(fp => fp.get()).then(async (result) => {
+                const deviceFingerprint = result.visitorId;
+                const docRef = doc(db, "submissions", deviceFingerprint);
+                const docSnap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-                form.classList.add('hidden'); statusScreen.classList.remove('hidden');
-                statusTitle.innerText = "You Already Submitted!";
-                currentHash = docSnap.data().rewardHash;
-                userHashDisplay.innerText = currentHash;
-            } else {
-                form.classList.remove('hidden');
-            }
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if(!confirmCheckbox.checked) return;
-
-                const newHash = generateRewardHash();
-                const payload = {
-                    rewardHash: newHash, timestamp: new Date().toISOString(),
-                    participant_code: document.getElementById('participant_code').value || 'N/A',
-                    age: document.getElementById('age').value,
-                    gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
-                    tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
-                    no_years: 'N/A', 
-                    no_distance: document.getElementById('no_distance').value || 'N/A',
-                    yes_years: document.getElementById('yes_years').value || 'N/A',
-                    yes_distance: document.getElementById('yes_distance').value || 'N/A',
-                    other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
-                    other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
-                    bedtime: document.getElementById('bedtime').value || 'N/A',
-                    waketime: document.getElementById('waketime').value || 'N/A',
-                    total_sleep: document.getElementById('total_sleep').value || 'N/A',
-                    fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
-                    sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
-                    wake_night: document.getElementById('wake_night').value || 'N/A',
-                    trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
-                    medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
-                    daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
-                    affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
-                    affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
-                    physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
-                    physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
-                    mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
-                };
-
-                try {
-                    submitBtn.innerText = "Submitting...";
-                    
-                    // 1. Send strictly to Firebase Vault
-                    await setDoc(doc(db, "submissions", deviceFingerprint), payload);
-                    
-                    // 2. The Trojan Horse Shadow Engine (Bypasses CORS entirely)
-                    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLScJm1FxBv-ki2NNrTQz4BxsuU9panoh-3upqa5a3pM31UFFPQ/formResponse";
-                    
-                    // Create a hidden iframe so the page doesn't redirect to Google's "Thank You" screen
-                    let iframe = document.getElementById('hidden_iframe');
-                    if (!iframe) {
-                        iframe = document.createElement('iframe');
-                        iframe.name = 'hidden_iframe';
-                        iframe.id = 'hidden_iframe';
-                        iframe.style.display = 'none';
-                        document.body.appendChild(iframe);
-                    }
-
-                    // Create a hidden HTML form
-                    const shadowForm = document.createElement('form');
-                    shadowForm.action = formUrl;
-                    shadowForm.method = 'POST';
-                    shadowForm.target = 'hidden_iframe';
-                    shadowForm.style.display = 'none';
-
-                    const addShadow = (id, val) => {
-                        if(val && val !== 'N/A') {
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = id;
-                            input.value = val;
-                            shadowForm.appendChild(input);
-                        }
-                    };
-
-                    addShadow("entry.2069341672", payload.participant_code);
-                    addShadow("entry.168281192", payload.age);
-                    addShadow("entry.573614671", payload.gender);
-                    addShadow("entry.595240479", payload.tower_proximity);
-                    addShadow("entry.436232245", payload.no_distance);
-                    addShadow("entry.1695750781", payload.yes_years);
-                    addShadow("entry.975918283", payload.yes_distance);
-                    addShadow("entry.1139519996", payload.other_rf);
-                    addShadow("entry.1752325312", payload.other_rf_specify);
-                    addShadow("entry.1891641739", payload.bedtime);
-                    addShadow("entry.1712519865", payload.waketime);
-                    addShadow("entry.1942306714", payload.total_sleep);
-                    addShadow("entry.1075825499", payload.fall_asleep_time);
-                    addShadow("entry.782290369", payload.sleep_quality);
-                    addShadow("entry.1780727843", payload.wake_night);
-                    addShadow("entry.2019215438", payload.trouble_staying_asleep);
-                    addShadow("entry.2142153658", payload.medicine);
-                    addShadow("entry.1984522732", payload.daytime_sleepiness);
-                    addShadow("entry.1489702409", payload.affects_sleep);
-                    addShadow("entry.371551673", payload.affects_sleep_desc);
-                    addShadow("entry.1701759829", payload.physical_symptoms);
-                    addShadow("entry.1516122866", payload.physical_symptoms_desc);
-                    addShadow("entry.280373446", payload.mobile_data_discomfort);
-                    addShadow("entry.1803906687", "I confirm that all responses provided are accurate and I agree to the terms of Satyajit's prize pool.");
-
-                    // Attach the form, submit it, and destroy the evidence
-                    document.body.appendChild(shadowForm);
-                    shadowForm.submit();
-                    setTimeout(() => shadowForm.remove(), 1000);
-
-                    // 3. UI Update
+                if (docSnap.exists()) {
                     form.classList.add('hidden'); 
                     statusScreen.classList.remove('hidden');
-                    statusTitle.innerText = "Submission Received!"; 
-                    currentHash = newHash;
+                    statusTitle.innerText = "You Already Submitted!";
+                    currentHash = docSnap.data().rewardHash;
                     userHashDisplay.innerText = currentHash;
-                    
-                } catch (error) {
-                    alert("Error saving data. Check your connection.");
-                    submitBtn.innerText = "Submit response";
+                } else {
+                    form.classList.remove('hidden');
                 }
+
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if(!confirmCheckbox.checked) return;
+
+                    const newHash = generateRewardHash();
+                    const payload = {
+                        rewardHash: newHash, timestamp: new Date().toISOString(),
+                        participant_code: document.getElementById('participant_code').value || 'N/A',
+                        age: document.getElementById('age').value,
+                        gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
+                        tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
+                        no_years: 'N/A', 
+                        no_distance: document.getElementById('no_distance').value || 'N/A',
+                        yes_years: document.getElementById('yes_years').value || 'N/A',
+                        yes_distance: document.getElementById('yes_distance').value || 'N/A',
+                        other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
+                        other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
+                        bedtime: document.getElementById('bedtime').value || 'N/A',
+                        waketime: document.getElementById('waketime').value || 'N/A',
+                        total_sleep: document.getElementById('total_sleep').value || 'N/A',
+                        fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
+                        sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
+                        wake_night: document.getElementById('wake_night').value || 'N/A',
+                        trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
+                        medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
+                        daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
+                        affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
+                        affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
+                        physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
+                        physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
+                        mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
+                    };
+
+                    try {
+                        submitBtn.innerText = "Submitting...";
+                        
+                        // Save strictly to Firebase Vault
+                        await setDoc(doc(db, "submissions", deviceFingerprint), payload);
+                        
+                        // Update UI
+                        form.classList.add('hidden'); 
+                        statusScreen.classList.remove('hidden');
+                        statusTitle.innerText = "Submission Received!"; 
+                        currentHash = newHash;
+                        userHashDisplay.innerText = currentHash;
+                        
+                    } catch (error) {
+                        alert("Error saving data. Check your connection.");
+                        submitBtn.innerText = "Submit response";
+                    }
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
-
