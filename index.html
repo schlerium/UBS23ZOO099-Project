@@ -337,9 +337,9 @@
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             if (days > 0) {
-                timerDisplay.innerText = `${days} Days, ${hours} Hours remaining`;
+                // FIXED: Now displays precise minutes alongside days and hours
+                timerDisplay.innerText = `${days} Days, ${hours} Hrs, ${minutes} Mins remaining`;
             } else {
-                // Formatting to keep it looking clean like "09h 05m 02s"
                 const h = hours < 10 ? "0" + hours : hours;
                 const m = minutes < 10 ? "0" + minutes : minutes;
                 const s = seconds < 10 ? "0" + seconds : seconds;
