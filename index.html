@@ -68,9 +68,14 @@
                 XXXX-XXXX
             </div>
             
-            <p class="text-red-600 font-black text-lg uppercase tracking-wide mb-8">TAKE A SCREENSHOT! If you lose this, you cannot claim your reward.</p>
+            <p class="text-red-600 font-black text-lg uppercase tracking-wide mb-6">TAKE A SCREENSHOT! If you lose this, you cannot claim your reward.</p>
 
-            <div class="border-t-2 border-dashed border-gray-300 pt-8 mt-4 opacity-50 select-none pointer-events-none">
+            <div class="mb-8 bg-gray-800 text-white p-4 rounded-xl border border-gray-700 shadow-inner inline-block w-full max-w-md">
+                <p class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-1">Time Remaining Until Deadline</p>
+                <p id="countdown-timer" class="text-2xl font-black text-cyan-400 font-mono tracking-wide">Calculating...</p>
+            </div>
+
+            <div class="border-t-2 border-dashed border-gray-300 pt-8 mt-2 opacity-50 select-none pointer-events-none">
                 <h3 class="text-xl font-bold text-gray-800 mb-1">🔒 Reward Claim Portal</h3>
                 <p class="text-sm text-gray-500 mb-6 font-bold">(This section will unlock when the participant counter hits 250)</p>
                 
@@ -284,7 +289,7 @@
         // SATORU SIR, PASTE YOUR FIREBASE CONFIG HERE
         // =========================================================================
         const firebaseConfig = {
-          apiKey: "AIzaSyBP3LSQMspafVMkfeX7Jze2ESdl2szJq6c",
+            apiKey: "AIzaSyBP3LSQMspafVMkfeX7Jze2ESdl2szJq6c",
             authDomain: "prototype-rfr-sp.firebaseapp.com",
             projectId: "prototype-rfr-sp",
             storageBucket: "prototype-rfr-sp.firebasestorage.app",
@@ -307,13 +312,44 @@
         const statusTitle = document.getElementById('status-title');
         const slider = document.getElementById('progress-slider');
         const sliderTooltip = document.getElementById('slider-tooltip');
+        const timerDisplay = document.getElementById('countdown-timer');
         
         // =========================================================================
-        // ⏰ THE DIGITAL TIME-BOMB (KILL SWITCH)
+        // ⏰ THE DIGITAL TIME-BOMB (KILL SWITCH & LIVE CLOCK)
         // Set exactly to March 30, 2026 at 23:59:59 India Standard Time (GMT+0530)
         // =========================================================================
         const deadline = new Date("March 30, 2026 23:59:59 GMT+0530").getTime();
         const isSurveyClosed = new Date().getTime() > deadline;
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = deadline - now;
+
+            if (distance < 0) {
+                timerDisplay.innerText = "DEADLINE REACHED";
+                timerDisplay.classList.replace('text-cyan-400', 'text-red-500');
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            if (days > 0) {
+                timerDisplay.innerText = `${days} Days, ${hours} Hours remaining`;
+            } else {
+                // Formatting to keep it looking clean like "09h 05m 02s"
+                const h = hours < 10 ? "0" + hours : hours;
+                const m = minutes < 10 ? "0" + minutes : minutes;
+                const s = seconds < 10 ? "0" + seconds : seconds;
+                timerDisplay.innerText = `${h}h ${m}m ${s}s remaining live`;
+            }
+        }
+        
+        // Start the clock immediately and set interval
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
 
         // Confirmation Checkbox
         const confirmCheckbox = document.getElementById('confirm_checkbox');
