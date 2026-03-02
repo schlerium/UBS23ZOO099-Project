@@ -243,9 +243,10 @@
         </form>
     </div>
 
+    <script>const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4').then(FingerprintJS => FingerprintJS.load());</script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getFirestore, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
         // =========================================================================
         // SATORU SIR, PASTE YOUR FIREBASE CONFIG HERE
@@ -271,7 +272,6 @@
         const counterDisplay = document.getElementById('participant-counter');
         const nthPersonText = document.getElementById('nth-person-text');
         
-        // Slider Variables
         const sliderHeader = document.getElementById('progress-slider-header');
         const tooltipHeader = document.getElementById('slider-tooltip-header');
         const sliderStatus = document.getElementById('progress-slider-status');
@@ -292,7 +292,7 @@
             }
         });
 
-        // Section 1: Conditional Greying Logic
+        // Section 1 UI Greying
         const proxRadios = document.querySelectorAll('input[name="tower_proximity"]');
         const ifNoGroup = document.getElementById('if-no-group');
         const ifYesGroup = document.getElementById('if-yes-group');
@@ -355,7 +355,6 @@
             }
         }));
 
-        // Helper Function for Ordinal Numbers (1st, 2nd, 3rd...)
         function getOrdinal(n) {
             if (!n || isNaN(n)) return "an early";
             let j = n % 10, k = n % 100;
@@ -365,98 +364,147 @@
             return n + "th";
         }
 
-        // Live Counter & Slider Updater
+        // Display Success Screen Helper
+        function showSuccessScreen(rank) {
+            form.classList.add('hidden'); 
+            header.classList.add('hidden'); 
+            statusScreen.classList.remove('hidden');
+            nthPersonText.innerText = `You are the ${getOrdinal(rank)} person to help me in this project 🗿🤝`;
+        }
+
+        // Live Counters (NO LONGER EDITS THE NTH TEXT)
         onSnapshot(collection(db, "submissions"), (snapshot) => {
             const count = snapshot.size;
             counterDisplay.innerText = count;
 
-            // Update Header Slider
             sliderHeader.value = count;
             tooltipHeader.innerText = count;
-            const percentHeader = (count / 250) * 100;
-            tooltipHeader.style.left = `calc(${percentHeader}% + (${8 - percentHeader * 0.15}px))`;
+            const pHead = (count / 250) * 100;
+            tooltipHeader.style.left = `calc(${pHead}% + (${8 - pHead * 0.15}px))`;
 
-            // Update Status Screen Slider
             sliderStatus.value = count;
             tooltipStatus.innerText = count;
-            const percentStatus = (count / 250) * 100;
-            tooltipStatus.style.left = `calc(${percentStatus}% + (${8 - percentStatus * 0.15}px))`;
+            const pStat = (count / 250) * 100;
+            tooltipStatus.style.left = `calc(${pStat}% + (${8 - pStat * 0.15}px))`;
         });
 
         // ==========================================================
-        // LOCAL BROWSER MEMORY (The Ultimate Lock)
+        // THE TITANIUM SHIELD: Safely check Memory
         // ==========================================================
-        const hasSubmitted = localStorage.getItem("satyajit_official_submitted");
-        const lockedRank = localStorage.getItem("satyajit_locked_rank");
-
-        if (hasSubmitted === "true") {
-            // User already submitted on this specific browser. Pull their locked memory!
-            form.classList.add('hidden'); 
-            header.classList.add('hidden'); 
-            statusScreen.classList.remove('hidden');
-            nthPersonText.innerText = `You are the ${getOrdinal(lockedRank)} person to help me in this project 🗿🤝`;
-        } else {
-            // Brand new browser session
-            form.classList.remove('hidden');
+        let localSubmitted = false;
+        let localRank = null;
+        try {
+            localSubmitted = localStorage.getItem("satyajit_official_submitted") === "true";
+            localRank = localStorage.getItem("satyajit_locked_rank");
+        } catch(e) {
+            console.warn("Browser blocked LocalStorage. Operating in safe mode.");
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!confirmCheckbox.checked) return;
+        // ==========================================================
+        // SUBMIT LISTENER SETUP
+        // ==========================================================
+        function attachSubmitLogic() {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!confirmCheckbox.checked) return;
 
-            // Grab the exact count right now and lock it
-            const currentCount = parseInt(counterDisplay.innerText) || 0;
-            const myAssignedNumber = currentCount + 1;
+                const currentCount = parseInt(counterDisplay.innerText) || 0;
+                const myAssignedNumber = currentCount + 1;
 
-            const payload = {
-                rewardHash: "CONTINGENCY-NO-HASH", 
-                participantNumber: myAssignedNumber,
-                timestamp: new Date().toISOString(),
-                participant_code: document.getElementById('participant_code').value || 'N/A',
-                age: document.getElementById('age').value,
-                gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
-                tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
-                no_years: 'N/A', 
-                no_distance: document.getElementById('no_distance').value || 'N/A',
-                yes_years: document.getElementById('yes_years').value || 'N/A',
-                yes_distance: document.getElementById('yes_distance').value || 'N/A',
-                other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
-                other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
-                bedtime: document.getElementById('bedtime').value || 'N/A',
-                waketime: document.getElementById('waketime').value || 'N/A',
-                total_sleep: document.getElementById('total_sleep').value || 'N/A',
-                fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
-                sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
-                wake_night: document.getElementById('wake_night').value || 'N/A',
-                trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
-                medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
-                daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
-                affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
-                affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
-                physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
-                physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
-                mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
-            };
+                const payload = {
+                    rewardHash: "CONTINGENCY-NO-HASH", 
+                    participantNumber: myAssignedNumber, // LOCKED FOREVER IN DATABASE
+                    timestamp: new Date().toISOString(),
+                    participant_code: document.getElementById('participant_code').value || 'N/A',
+                    age: document.getElementById('age').value,
+                    gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
+                    tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
+                    no_years: 'N/A', 
+                    no_distance: document.getElementById('no_distance').value || 'N/A',
+                    yes_years: document.getElementById('yes_years').value || 'N/A',
+                    yes_distance: document.getElementById('yes_distance').value || 'N/A',
+                    other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
+                    other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
+                    bedtime: document.getElementById('bedtime').value || 'N/A',
+                    waketime: document.getElementById('waketime').value || 'N/A',
+                    total_sleep: document.getElementById('total_sleep').value || 'N/A',
+                    fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
+                    sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
+                    wake_night: document.getElementById('wake_night').value || 'N/A',
+                    trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
+                    medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
+                    daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
+                    affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
+                    affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
+                    physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
+                    physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
+                    mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
+                };
 
+                try {
+                    submitBtn.innerText = "Submitting...";
+                    
+                    // 1. ADD-DOC: This forces Firebase to make a totally new file. Zero overwrites ever again.
+                    await addDoc(collection(db, "submissions"), payload);
+                    
+                    // 2. Lock it in memory so this specific browser remembers its rank
+                    try {
+                        localStorage.setItem("satyajit_official_submitted", "true");
+                        localStorage.setItem("satyajit_locked_rank", myAssignedNumber);
+                    } catch(e) {}
+                    
+                    showSuccessScreen(myAssignedNumber);
+                    
+                } catch (error) {
+                    alert("Error saving data. Check your connection.");
+                    submitBtn.innerText = "Submit response";
+                }
+            });
+        }
+
+        // ==========================================================
+        // INITIALIZATION
+        // ==========================================================
+        fpPromise.then(fp => fp.get()).then(async (result) => {
+            const fingerprint = result.visitorId;
+
+            // Check 1: Did they submit recently using the new memory lock?
+            if (localSubmitted) {
+                showSuccessScreen(localRank);
+                return;
+            }
+
+            // Check 2: Did they submit YESTERDAY using the old Fingerprint method?
             try {
-                submitBtn.innerText = "Submitting...";
+                const docRef = doc(db, "submissions", fingerprint);
+                const docSnap = await getDoc(docRef);
                 
-                // USE ADDDOC: This tells Firebase to make a brand new file for every single click. No more overwriting!
-                await addDoc(collection(db, "submissions"), payload);
-                
-                // Lock it in the phone's browser memory FOREVER
-                localStorage.setItem("satyajit_official_submitted", "true");
-                localStorage.setItem("satyajit_locked_rank", myAssignedNumber);
-                
-                // Update UI and show their locked rank
-                form.classList.add('hidden'); 
-                header.classList.add('hidden'); 
-                statusScreen.classList.remove('hidden');
-                nthPersonText.innerText = `You are the ${getOrdinal(myAssignedNumber)} person to help me in this project 🗿🤝`;
-                
-            } catch (error) {
-                alert("Error saving data. Check your connection.");
-                submitBtn.innerText = "Submit response";
+                if (docSnap.exists()) {
+                    // We found them! Pull their old rank.
+                    let legacyRank = docSnap.data().participantNumber || "an early";
+                    
+                    // Back-up their rank to the new memory lock so we don't have to ask Firebase next time
+                    try {
+                        localStorage.setItem("satyajit_official_submitted", "true");
+                        localStorage.setItem("satyajit_locked_rank", legacyRank);
+                    } catch(e) {}
+                    
+                    showSuccessScreen(legacyRank);
+                    return;
+                }
+            } catch(e) { console.warn("Firebase legacy check failed."); }
+
+            // Check 3: Completely new user!
+            form.classList.remove('hidden');
+            attachSubmitLogic();
+
+        }).catch(err => {
+            // BACKUP: If an Adblocker completely blocks the Fingerprint script, we still let them survey!
+            if (localSubmitted) {
+                showSuccessScreen(localRank);
+            } else {
+                form.classList.remove('hidden');
+                attachSubmitLogic();
             }
         });
     </script>
