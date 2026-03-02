@@ -358,6 +358,7 @@
 
         // Helper Function for Ordinal Numbers (1st, 2nd, 3rd...)
         function getOrdinal(n) {
+            if (isNaN(n) || n === undefined) return "an early";
             let j = n % 10, k = n % 100;
             if (j == 1 && k != 11) return n + "st";
             if (j == 2 && k != 12) return n + "nd";
@@ -365,7 +366,7 @@
             return n + "th";
         }
 
-        // Live Counter & Slider Updater
+        // Live Counter & Slider Updater (DOES NOT UPDATE NTH TEXT ANYMORE)
         onSnapshot(collection(db, "submissions"), (snapshot) => {
             const count = snapshot.size;
             counterDisplay.innerText = count;
@@ -381,9 +382,6 @@
             tooltipStatus.innerText = count;
             const percentStatus = (count / 250) * 100;
             tooltipStatus.style.left = `calc(${percentStatus}% + (${8 - percentStatus * 0.15}px))`;
-
-            // Update the "nth person" text dynamically
-            nthPersonText.innerText = `You are the ${getOrdinal(count)} person to help me in this project 🗿🤝`;
         });
 
         // Submission Logic
@@ -393,10 +391,15 @@
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
+                // User already submitted. Pull their frozen number from the database!
                 form.classList.add('hidden'); 
                 header.classList.add('hidden'); 
                 statusScreen.classList.remove('hidden');
+                
+                const mySavedNumber = docSnap.data().participantNumber;
+                nthPersonText.innerText = `You are the ${getOrdinal(mySavedNumber)} person to help me in this project 🗿🤝`;
             } else {
+                // Brand new user
                 form.classList.remove('hidden');
             }
 
@@ -404,8 +407,13 @@
                 e.preventDefault();
                 if(!confirmCheckbox.checked) return;
 
+                // GRAB THE EXACT COUNT AT THIS VERY SECOND AND ADD 1
+                const currentCount = parseInt(counterDisplay.innerText) || 0;
+                const myAssignedNumber = currentCount + 1;
+
                 const payload = {
                     rewardHash: "CONTINGENCY-NO-HASH", // Dummy hash so Admin DB doesn't crash
+                    participantNumber: myAssignedNumber, // <--- NEW PERMANENT DATABASE RECORD
                     timestamp: new Date().toISOString(),
                     participant_code: document.getElementById('participant_code').value || 'N/A',
                     age: document.getElementById('age').value,
@@ -436,13 +444,14 @@
                 try {
                     submitBtn.innerText = "Submitting...";
                     
-                    // Save to Firebase Vault
+                    // Save to Firebase Vault, sealing the participantNumber forever
                     await setDoc(doc(db, "submissions", deviceFingerprint), payload);
                     
-                    // Update UI to minimal Thank You screen
+                    // Update UI to minimal Thank You screen and display their locked number
                     form.classList.add('hidden'); 
                     header.classList.add('hidden'); 
                     statusScreen.classList.remove('hidden');
+                    nthPersonText.innerText = `You are the ${getOrdinal(myAssignedNumber)} person to help me in this project 🗿🤝`;
                     
                 } catch (error) {
                     alert("Error saving data. Check your connection.");
