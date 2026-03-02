@@ -61,10 +61,16 @@
             </div>
 
             <p class="mt-12 text-[10px] text-gray-500 opacity-50 italic tracking-wide select-none">I owe u a snack or something. reach me for that ;)</p>
+
+            <button id="native-share-btn" class="mt-6 flex items-center justify-center gap-2 mx-auto bg-white border-2 border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-black font-bold py-3 px-6 rounded-xl transition-all shadow-sm active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                </svg>
+                Share to Others 🙂pls
+            </button>
         </div>
 
         <form id="survey-form" class="hidden">
-            
             <div class="glass-panel">
                 <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 1 - Participant Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -274,6 +280,7 @@
         const statusScreen = document.getElementById('status-screen');
         const counterDisplay = document.getElementById('participant-counter');
         const nthPersonText = document.getElementById('nth-person-text');
+        const shareBtn = document.getElementById('native-share-btn');
         
         const sliderHeader = document.getElementById('progress-slider-header');
         const tooltipHeader = document.getElementById('slider-tooltip-header');
@@ -367,15 +374,55 @@
             return n + "th";
         }
 
-        // Display Success Screen Helper
+        // ==========================================================
+        // SHARE BUTTON LOGIC (Web Share API)
+        // ==========================================================
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                // Hardcoding the official fallback link
+                const shareUrl = 'https://schlerium.github.io/UBS23ZOO099-Project/official/';
+                
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Sleep Pattern Survey',
+                            text: 'Hey! Help Satyajit out with his 6th Semester Zoology project by taking this quick survey.',
+                            url: shareUrl
+                        });
+                    } catch (err) {
+                        console.log('Share cancelled or error.');
+                    }
+                } else {
+                    // Fallback for Desktop / old browsers
+                    navigator.clipboard.writeText(shareUrl);
+                    const originalHTML = shareBtn.innerHTML;
+                    shareBtn.innerHTML = "✅ Link Copied!";
+                    setTimeout(() => { shareBtn.innerHTML = originalHTML; }, 2000);
+                }
+            });
+        }
+
+        // ==========================================================
+        // SUCCESS SCREEN LOGIC
+        // ==========================================================
         function showSuccessScreen(rank) {
             form.classList.add('hidden'); 
             header.classList.add('hidden'); 
             statusScreen.classList.remove('hidden');
             nthPersonText.innerText = `You are the ${getOrdinal(rank)} person to help me in this project 🗿🤝`;
+
+            // FIRE CONFETTI EVERY SINGLE TIME THIS SCREEN LOADS
+            if (typeof confetti === "function") {
+                confetti({
+                    particleCount: 80,
+                    spread: 60,
+                    origin: { y: 0.6 },
+                    disableForReducedMotion: true
+                });
+            }
         }
 
-        // Live Counters (NO LONGER EDITS THE NTH TEXT)
+        // Live Counters 
         onSnapshot(collection(db, "submissions"), (snapshot) => {
             const count = snapshot.size;
             counterDisplay.innerText = count;
@@ -391,9 +438,7 @@
             tooltipStatus.style.left = `calc(${pStat}% + (${8 - pStat * 0.15}px))`;
         });
 
-        // ==========================================================
-        // THE TITANIUM SHIELD: Safely check Memory
-        // ==========================================================
+        // The Titanium Shield: Safely check Memory
         let localSubmitted = false;
         let localRank = null;
         try {
@@ -403,9 +448,6 @@
             console.warn("Browser blocked LocalStorage. Operating in safe mode.");
         }
 
-        // ==========================================================
-        // SUBMIT LISTENER SETUP
-        // ==========================================================
         function attachSubmitLogic() {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -416,7 +458,7 @@
 
                 const payload = {
                     rewardHash: "CONTINGENCY-NO-HASH", 
-                    participantNumber: myAssignedNumber, // LOCKED FOREVER IN DATABASE
+                    participantNumber: myAssignedNumber,
                     timestamp: new Date().toISOString(),
                     participant_code: document.getElementById('participant_code').value || 'N/A',
                     age: document.getElementById('age').value,
@@ -447,26 +489,14 @@
                 try {
                     submitBtn.innerText = "Submitting...";
                     
-                    // 1. ADD-DOC: This forces Firebase to make a totally new file. Zero overwrites ever again.
                     await addDoc(collection(db, "submissions"), payload);
                     
-                    // 2. Lock it in memory so this specific browser remembers its rank
                     try {
                         localStorage.setItem("satyajit_official_submitted", "true");
                         localStorage.setItem("satyajit_locked_rank", myAssignedNumber);
                     } catch(e) {}
                     
                     showSuccessScreen(myAssignedNumber);
-
-                    // 3. FIRE THE CONFETTI (Minimal & Elegant)
-                    if (typeof confetti === "function") {
-                        confetti({
-                            particleCount: 60,
-                            spread: 55,
-                            origin: { y: 0.6 },
-                            disableForReducedMotion: true
-                        });
-                    }
                     
                 } catch (error) {
                     alert("Error saving data. Check your connection.");
@@ -475,28 +505,21 @@
             });
         }
 
-        // ==========================================================
-        // INITIALIZATION
-        // ==========================================================
         fpPromise.then(fp => fp.get()).then(async (result) => {
             const fingerprint = result.visitorId;
 
-            // Check 1: Did they submit recently using the new memory lock?
             if (localSubmitted) {
                 showSuccessScreen(localRank);
                 return;
             }
 
-            // Check 2: Did they submit YESTERDAY using the old Fingerprint method?
             try {
                 const docRef = doc(db, "submissions", fingerprint);
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
-                    // We found them! Pull their old rank.
                     let legacyRank = docSnap.data().participantNumber || "an early";
                     
-                    // Back-up their rank to the new memory lock so we don't have to ask Firebase next time
                     try {
                         localStorage.setItem("satyajit_official_submitted", "true");
                         localStorage.setItem("satyajit_locked_rank", legacyRank);
@@ -507,12 +530,10 @@
                 }
             } catch(e) { console.warn("Firebase legacy check failed."); }
 
-            // Check 3: Completely new user!
             form.classList.remove('hidden');
             attachSubmitLogic();
 
         }).catch(err => {
-            // BACKUP: If an Adblocker completely blocks the Fingerprint script, we still let them survey!
             if (localSubmitted) {
                 showSuccessScreen(localRank);
             } else {
