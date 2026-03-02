@@ -243,10 +243,9 @@
         </form>
     </div>
 
-    <script>const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4').then(FingerprintJS => FingerprintJS.load());</script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { getFirestore, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
         // =========================================================================
         // SATORU SIR, PASTE YOUR FIREBASE CONFIG HERE
@@ -358,7 +357,7 @@
 
         // Helper Function for Ordinal Numbers (1st, 2nd, 3rd...)
         function getOrdinal(n) {
-            if (isNaN(n) || n === undefined) return "an early";
+            if (!n || isNaN(n)) return "an early";
             let j = n % 10, k = n % 100;
             if (j == 1 && k != 11) return n + "st";
             if (j == 2 && k != 12) return n + "nd";
@@ -366,7 +365,7 @@
             return n + "th";
         }
 
-        // Live Counter & Slider Updater (DOES NOT UPDATE NTH TEXT ANYMORE)
+        // Live Counter & Slider Updater
         onSnapshot(collection(db, "submissions"), (snapshot) => {
             const count = snapshot.size;
             counterDisplay.innerText = count;
@@ -384,80 +383,81 @@
             tooltipStatus.style.left = `calc(${percentStatus}% + (${8 - percentStatus * 0.15}px))`;
         });
 
-        // Submission Logic
-        fpPromise.then(fp => fp.get()).then(async (result) => {
-            const deviceFingerprint = result.visitorId;
-            const docRef = doc(db, "submissions", deviceFingerprint);
-            const docSnap = await getDoc(docRef);
+        // ==========================================================
+        // LOCAL BROWSER MEMORY (The Ultimate Lock)
+        // ==========================================================
+        const hasSubmitted = localStorage.getItem("satyajit_official_submitted");
+        const lockedRank = localStorage.getItem("satyajit_locked_rank");
 
-            if (docSnap.exists()) {
-                // User already submitted. Pull their frozen number from the database!
+        if (hasSubmitted === "true") {
+            // User already submitted on this specific browser. Pull their locked memory!
+            form.classList.add('hidden'); 
+            header.classList.add('hidden'); 
+            statusScreen.classList.remove('hidden');
+            nthPersonText.innerText = `You are the ${getOrdinal(lockedRank)} person to help me in this project 🗿🤝`;
+        } else {
+            // Brand new browser session
+            form.classList.remove('hidden');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!confirmCheckbox.checked) return;
+
+            // Grab the exact count right now and lock it
+            const currentCount = parseInt(counterDisplay.innerText) || 0;
+            const myAssignedNumber = currentCount + 1;
+
+            const payload = {
+                rewardHash: "CONTINGENCY-NO-HASH", 
+                participantNumber: myAssignedNumber,
+                timestamp: new Date().toISOString(),
+                participant_code: document.getElementById('participant_code').value || 'N/A',
+                age: document.getElementById('age').value,
+                gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
+                tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
+                no_years: 'N/A', 
+                no_distance: document.getElementById('no_distance').value || 'N/A',
+                yes_years: document.getElementById('yes_years').value || 'N/A',
+                yes_distance: document.getElementById('yes_distance').value || 'N/A',
+                other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
+                other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
+                bedtime: document.getElementById('bedtime').value || 'N/A',
+                waketime: document.getElementById('waketime').value || 'N/A',
+                total_sleep: document.getElementById('total_sleep').value || 'N/A',
+                fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
+                sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
+                wake_night: document.getElementById('wake_night').value || 'N/A',
+                trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
+                medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
+                daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
+                affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
+                affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
+                physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
+                physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
+                mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
+            };
+
+            try {
+                submitBtn.innerText = "Submitting...";
+                
+                // USE ADDDOC: This tells Firebase to make a brand new file for every single click. No more overwriting!
+                await addDoc(collection(db, "submissions"), payload);
+                
+                // Lock it in the phone's browser memory FOREVER
+                localStorage.setItem("satyajit_official_submitted", "true");
+                localStorage.setItem("satyajit_locked_rank", myAssignedNumber);
+                
+                // Update UI and show their locked rank
                 form.classList.add('hidden'); 
                 header.classList.add('hidden'); 
                 statusScreen.classList.remove('hidden');
+                nthPersonText.innerText = `You are the ${getOrdinal(myAssignedNumber)} person to help me in this project 🗿🤝`;
                 
-                const mySavedNumber = docSnap.data().participantNumber;
-                nthPersonText.innerText = `You are the ${getOrdinal(mySavedNumber)} person to help me in this project 🗿🤝`;
-            } else {
-                // Brand new user
-                form.classList.remove('hidden');
+            } catch (error) {
+                alert("Error saving data. Check your connection.");
+                submitBtn.innerText = "Submit response";
             }
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if(!confirmCheckbox.checked) return;
-
-                // GRAB THE EXACT COUNT AT THIS VERY SECOND AND ADD 1
-                const currentCount = parseInt(counterDisplay.innerText) || 0;
-                const myAssignedNumber = currentCount + 1;
-
-                const payload = {
-                    rewardHash: "CONTINGENCY-NO-HASH", // Dummy hash so Admin DB doesn't crash
-                    participantNumber: myAssignedNumber, // <--- NEW PERMANENT DATABASE RECORD
-                    timestamp: new Date().toISOString(),
-                    participant_code: document.getElementById('participant_code').value || 'N/A',
-                    age: document.getElementById('age').value,
-                    gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
-                    tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
-                    no_years: 'N/A', 
-                    no_distance: document.getElementById('no_distance').value || 'N/A',
-                    yes_years: document.getElementById('yes_years').value || 'N/A',
-                    yes_distance: document.getElementById('yes_distance').value || 'N/A',
-                    other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
-                    other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
-                    bedtime: document.getElementById('bedtime').value || 'N/A',
-                    waketime: document.getElementById('waketime').value || 'N/A',
-                    total_sleep: document.getElementById('total_sleep').value || 'N/A',
-                    fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
-                    sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
-                    wake_night: document.getElementById('wake_night').value || 'N/A',
-                    trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
-                    medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
-                    daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
-                    affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
-                    affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
-                    physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
-                    physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
-                    mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
-                };
-
-                try {
-                    submitBtn.innerText = "Submitting...";
-                    
-                    // Save to Firebase Vault, sealing the participantNumber forever
-                    await setDoc(doc(db, "submissions", deviceFingerprint), payload);
-                    
-                    // Update UI to minimal Thank You screen and display their locked number
-                    form.classList.add('hidden'); 
-                    header.classList.add('hidden'); 
-                    statusScreen.classList.remove('hidden');
-                    nthPersonText.innerText = `You are the ${getOrdinal(myAssignedNumber)} person to help me in this project 🗿🤝`;
-                    
-                } catch (error) {
-                    alert("Error saving data. Check your connection.");
-                    submitBtn.innerText = "Submit response";
-                }
-            });
         });
     </script>
 </body>
