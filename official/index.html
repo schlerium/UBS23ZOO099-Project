@@ -13,12 +13,48 @@
         input[type="text"], input[type="number"], input[type="time"], select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
         .radio-group label { margin-right: 1rem; cursor: pointer; }
         input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #fff; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
+        
+        /* CINEMATIC WELCOME ANIMATIONS */
+        @keyframes slideBar {
+            0% { transform: translateX(-150vw); }
+            100% { transform: translateX(150vw); }
+        }
+        .anim-bar {
+            position: absolute;
+            background: #111;
+            border-radius: 9999px;
+            animation: slideBar 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes textPop {
+            0% { opacity: 0; transform: scale(0.9); }
+            30% { opacity: 1; transform: scale(1.05); }
+            70% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); }
+        }
+        .anim-text {
+            animation: textPop 2.2s ease-in-out forwards;
+            opacity: 0;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
+    <div id="welcome-overlay" class="fixed inset-0 z-50 bg-white flex items-center justify-center hidden transition-opacity duration-500">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="anim-bar h-3 w-1/3 top-[15%]" style="animation-delay: 0.1s"></div>
+            <div class="anim-bar h-5 w-1/2 top-[25%]" style="animation-delay: 0.3s"></div>
+            <div class="anim-bar h-2 w-2/5 top-[35%]" style="animation-delay: 0.2s"></div>
+            <div class="anim-bar h-6 w-3/4 top-[65%]" style="animation-delay: 0.4s"></div>
+            <div class="anim-bar h-3 w-1/4 top-[80%]" style="animation-delay: 0.15s"></div>
+            <div class="anim-bar h-4 w-2/3 top-[90%]" style="animation-delay: 0.35s"></div>
+        </div>
+        <h1 class="anim-text text-5xl md:text-7xl font-black text-gray-400 tracking-widest uppercase z-10" style="font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;">
+            WELCOME
+        </h1>
+    </div>
+
     <div class="max-w-3xl mx-auto">
-        <div id="survey-header" class="border-4 border-black p-6 md:p-10 rounded-3xl bg-white text-center mb-8">
+        <div id="survey-header" class="border-4 border-black p-6 md:p-10 rounded-3xl bg-white text-center mb-8 hidden">
             <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-black">Effects of Radiations from Cell Towers on Sleeping Pattern of People Around The Tower</h1>
             <p class="text-lg mt-2 font-normal text-gray-800">for SATYAJIT's Zoology 6th Semester Project</p>
 
@@ -71,6 +107,7 @@
         </div>
 
         <form id="survey-form" class="hidden">
+            
             <div class="glass-panel">
                 <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 1 - Participant Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -281,6 +318,7 @@
         const counterDisplay = document.getElementById('participant-counter');
         const nthPersonText = document.getElementById('nth-person-text');
         const shareBtn = document.getElementById('native-share-btn');
+        const welcomeOverlay = document.getElementById('welcome-overlay');
         
         const sliderHeader = document.getElementById('progress-slider-header');
         const tooltipHeader = document.getElementById('slider-tooltip-header');
@@ -375,11 +413,26 @@
         }
 
         // ==========================================================
+        // WELCOME ANIMATION LOGIC
+        // ==========================================================
+        function playWelcomeAnimation(callback) {
+            welcomeOverlay.classList.remove('hidden');
+            
+            // Wait for animations to finish, then fade out the overlay
+            setTimeout(() => {
+                welcomeOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    welcomeOverlay.classList.add('hidden');
+                    callback();
+                }, 500); // Wait for opacity transition
+            }, 2400); // Time to let the text pop and bars slide
+        }
+
+        // ==========================================================
         // SHARE BUTTON LOGIC (Web Share API)
         // ==========================================================
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
-                // Hardcoding the official fallback link
                 const shareUrl = 'https://schlerium.github.io/UBS23ZOO099-Project/official/';
                 
                 if (navigator.share) {
@@ -390,10 +443,9 @@
                             url: shareUrl
                         });
                     } catch (err) {
-                        console.log('Share cancelled or error.');
+                        console.log('Share cancelled.');
                     }
                 } else {
-                    // Fallback for Desktop / old browsers
                     navigator.clipboard.writeText(shareUrl);
                     const originalHTML = shareBtn.innerHTML;
                     shareBtn.innerHTML = "✅ Link Copied!";
@@ -403,7 +455,7 @@
         }
 
         // ==========================================================
-        // SUCCESS SCREEN LOGIC
+        // SUCCESS SCREEN LOGIC (Always Fires Confetti Now)
         // ==========================================================
         function showSuccessScreen(rank) {
             form.classList.add('hidden'); 
@@ -411,11 +463,10 @@
             statusScreen.classList.remove('hidden');
             nthPersonText.innerText = `You are the ${getOrdinal(rank)} person to help me in this project 🗿🤝`;
 
-            // FIRE CONFETTI EVERY SINGLE TIME THIS SCREEN LOADS
             if (typeof confetti === "function") {
                 confetti({
-                    particleCount: 80,
-                    spread: 60,
+                    particleCount: 100,
+                    spread: 70,
                     origin: { y: 0.6 },
                     disableForReducedMotion: true
                 });
@@ -438,14 +489,14 @@
             tooltipStatus.style.left = `calc(${pStat}% + (${8 - pStat * 0.15}px))`;
         });
 
-        // The Titanium Shield: Safely check Memory
+        // Memory Check
         let localSubmitted = false;
         let localRank = null;
         try {
             localSubmitted = localStorage.getItem("satyajit_official_submitted") === "true";
             localRank = localStorage.getItem("satyajit_locked_rank");
         } catch(e) {
-            console.warn("Browser blocked LocalStorage. Operating in safe mode.");
+            console.warn("Browser blocked LocalStorage.");
         }
 
         function attachSubmitLogic() {
@@ -505,40 +556,53 @@
             });
         }
 
+        // ==========================================================
+        // STARTUP ROUTING
+        // ==========================================================
         fpPromise.then(fp => fp.get()).then(async (result) => {
             const fingerprint = result.visitorId;
 
+            // User already submitted on this browser? Go straight to success (No welcome animation).
             if (localSubmitted) {
                 showSuccessScreen(localRank);
                 return;
             }
 
+            // Check Firebase for past submission
             try {
                 const docRef = doc(db, "submissions", fingerprint);
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
                     let legacyRank = docSnap.data().participantNumber || "an early";
-                    
                     try {
                         localStorage.setItem("satyajit_official_submitted", "true");
                         localStorage.setItem("satyajit_locked_rank", legacyRank);
                     } catch(e) {}
                     
+                    // Go straight to success screen (No welcome animation)
                     showSuccessScreen(legacyRank);
                     return;
                 }
             } catch(e) { console.warn("Firebase legacy check failed."); }
 
-            form.classList.remove('hidden');
-            attachSubmitLogic();
+            // BRAND NEW USER DETECTED - Play the animation!
+            playWelcomeAnimation(() => {
+                header.classList.remove('hidden');
+                form.classList.remove('hidden');
+                attachSubmitLogic();
+            });
 
         }).catch(err => {
+            // Failsafe for adblockers
             if (localSubmitted) {
                 showSuccessScreen(localRank);
             } else {
-                form.classList.remove('hidden');
-                attachSubmitLogic();
+                playWelcomeAnimation(() => {
+                    header.classList.remove('hidden');
+                    form.classList.remove('hidden');
+                    attachSubmitLogic();
+                });
             }
         });
     </script>
