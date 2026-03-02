@@ -11,6 +11,7 @@
         .hidden { display: none !important; }
         input[type="text"], input[type="number"], input[type="time"], select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
         .radio-group label { margin-right: 1rem; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #fff; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -24,6 +25,14 @@
                 <span class="text-2xl font-bold text-black">Participants: <span id="participant-counter">0</span></span>
             </div>
 
+            <div class="mt-8 flex flex-col items-center">
+                <div class="w-full max-w-sm relative">
+                    <div id="slider-tooltip-header" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-white transition-all duration-300">0</div>
+                    <input type="range" min="0" max="250" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-header">
+                    <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>250</span></div>
+                </div>
+            </div>
+
             <div class="flex justify-center items-center space-x-8 mt-10 mb-8 text-6xl">
                 <span>📡</span>
                 <span class="text-red-600 font-bold text-5xl">❓</span>
@@ -35,12 +44,19 @@
             </ul>
         </div>
 
-        <div id="status-screen" class="hidden border-4 border-black rounded-3xl bg-white text-center py-24 px-4 flex flex-col justify-center items-center min-h-[60vh] mb-8 shadow-sm">
-            <h2 class="text-4xl md:text-6xl font-['Times_New_Roman',_Times,_serif] text-black mb-16 leading-tight uppercase tracking-wide">
+        <div id="status-screen" class="hidden border-4 border-black rounded-3xl bg-white text-center py-16 px-4 flex flex-col justify-center items-center min-h-[60vh] mb-8 shadow-sm">
+            <h2 class="text-4xl md:text-6xl font-['Times_New_Roman',_Times,_serif] text-black mb-10 leading-tight uppercase tracking-wide">
                 Thank You<br>For Your Time
             </h2>
-            <div class="border border-gray-200 rounded-xl px-10 py-4 bg-white shadow-sm inline-block">
-                <p class="text-xl md:text-2xl font-['Times_New_Roman',_Times,_serif] text-black">Response Submitted</p>
+            <div class="border border-gray-200 rounded-xl px-10 py-4 bg-white shadow-sm inline-block mb-10">
+                <p class="text-xl md:text-2xl font-['Times_New_Roman',_Times,_serif] text-black font-bold">Response Submitted</p>
+                <p id="nth-person-text" class="text-sm font-['Times_New_Roman',_Times,_serif] text-gray-800 mt-3">You are the nth person to help me in this project 🗿🤝</p>
+            </div>
+
+            <div class="w-full max-w-sm relative mt-4">
+                <div id="slider-tooltip-status" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-white transition-all duration-300">0</div>
+                <input type="range" min="0" max="250" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-status">
+                <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>250</span></div>
             </div>
         </div>
 
@@ -254,6 +270,13 @@
         const header = document.getElementById('survey-header');
         const statusScreen = document.getElementById('status-screen');
         const counterDisplay = document.getElementById('participant-counter');
+        const nthPersonText = document.getElementById('nth-person-text');
+        
+        // Slider Variables
+        const sliderHeader = document.getElementById('progress-slider-header');
+        const tooltipHeader = document.getElementById('slider-tooltip-header');
+        const sliderStatus = document.getElementById('progress-slider-status');
+        const tooltipStatus = document.getElementById('slider-tooltip-status');
         
         // Confirmation Checkbox
         const confirmCheckbox = document.getElementById('confirm_checkbox');
@@ -270,7 +293,7 @@
             }
         });
 
-        // Section 1: Conditional Greying Proximity
+        // Section 1: Conditional Greying Logic
         const proxRadios = document.querySelectorAll('input[name="tower_proximity"]');
         const ifNoGroup = document.getElementById('if-no-group');
         const ifYesGroup = document.getElementById('if-yes-group');
@@ -289,25 +312,20 @@
             }
         }));
 
-        // Section 1: Conditional Greying RF Exposure
         const rfRadios = document.querySelectorAll('input[name="other_rf"]');
         const rfSpecify = document.getElementById('other_rf_specify');
         const reqRfSpecify = document.getElementById('req_rf_specify');
 
         rfRadios.forEach(radio => radio.addEventListener('change', (e) => {
             if(e.target.value === 'Yes') {
-                rfSpecify.required = true;
-                rfSpecify.classList.remove('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                rfSpecify.required = true; rfSpecify.classList.remove('opacity-50', 'pointer-events-none', 'bg-gray-100');
                 reqRfSpecify.classList.remove('hidden');
             } else {
-                rfSpecify.required = false;
-                rfSpecify.classList.add('opacity-50', 'pointer-events-none', 'bg-gray-100');
-                reqRfSpecify.classList.add('hidden');
-                rfSpecify.value = '';
+                rfSpecify.required = false; rfSpecify.classList.add('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqRfSpecify.classList.add('hidden'); rfSpecify.value = '';
             }
         }));
 
-        // Section 4: Conditional Mandatory Fields
         const affectsRadios = document.querySelectorAll('input[name="affects_sleep"]');
         const affectsDesc = document.getElementById('affects_sleep_desc');
         const reqAffects = document.getElementById('req_affects_desc');
@@ -338,12 +356,37 @@
             }
         }));
 
-        // Live Counter (Standard Mode)
+        // Helper Function for Ordinal Numbers (1st, 2nd, 3rd...)
+        function getOrdinal(n) {
+            let j = n % 10, k = n % 100;
+            if (j == 1 && k != 11) return n + "st";
+            if (j == 2 && k != 12) return n + "nd";
+            if (j == 3 && k != 13) return n + "rd";
+            return n + "th";
+        }
+
+        // Live Counter & Slider Updater
         onSnapshot(collection(db, "submissions"), (snapshot) => {
-            counterDisplay.innerText = snapshot.size;
+            const count = snapshot.size;
+            counterDisplay.innerText = count;
+
+            // Update Header Slider
+            sliderHeader.value = count;
+            tooltipHeader.innerText = count;
+            const percentHeader = (count / 250) * 100;
+            tooltipHeader.style.left = `calc(${percentHeader}% + (${8 - percentHeader * 0.15}px))`;
+
+            // Update Status Screen Slider
+            sliderStatus.value = count;
+            tooltipStatus.innerText = count;
+            const percentStatus = (count / 250) * 100;
+            tooltipStatus.style.left = `calc(${percentStatus}% + (${8 - percentStatus * 0.15}px))`;
+
+            // Update the "nth person" text dynamically
+            nthPersonText.innerText = `You are the ${getOrdinal(count)} person to help me in this project 🗿🤝`;
         });
 
-        // Submission
+        // Submission Logic
         fpPromise.then(fp => fp.get()).then(async (result) => {
             const deviceFingerprint = result.visitorId;
             const docRef = doc(db, "submissions", deviceFingerprint);
