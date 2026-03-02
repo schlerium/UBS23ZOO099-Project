@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleep Pattern Survey</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: #f3f4f6; font-family: 'Helvetica', Arial, sans-serif; }
         .glass-panel { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 2rem; }
@@ -58,6 +59,8 @@
                 <input type="range" min="0" max="250" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-status">
                 <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>250</span></div>
             </div>
+
+            <p class="mt-12 text-[10px] text-gray-500 opacity-50 italic tracking-wide select-none">I owe u a snack or something. reach me for that ;)</p>
         </div>
 
         <form id="survey-form" class="hidden">
@@ -454,6 +457,16 @@
                     } catch(e) {}
                     
                     showSuccessScreen(myAssignedNumber);
+
+                    // 3. FIRE THE CONFETTI (Minimal & Elegant)
+                    if (typeof confetti === "function") {
+                        confetti({
+                            particleCount: 60,
+                            spread: 55,
+                            origin: { y: 0.6 },
+                            disableForReducedMotion: true
+                        });
+                    }
                     
                 } catch (error) {
                     alert("Error saving data. Check your connection.");
