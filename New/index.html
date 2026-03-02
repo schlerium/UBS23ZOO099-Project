@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Pattern Survey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Helvetica', Arial, sans-serif; }
+        .glass-panel { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 2rem; }
+        .hidden { display: none !important; }
+        input[type="text"], input[type="number"], input[type="time"], select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .radio-group label { margin-right: 1rem; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fbbf24; border: 2px solid #fff; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <svg id="satya-coin-template" class="hidden" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="white" stroke="black" stroke-width="2"/>
+        <polygon points="50,10 35,28 35,72 50,90 65,72 65,28" fill="none" stroke="black" stroke-width="3"/>
+        <rect x="28" y="16" width="44" height="4" fill="#00bfff" stroke="black" stroke-width="2"/>
+        <rect x="28" y="80" width="44" height="4" fill="#00bfff" stroke="black" stroke-width="2"/>
+        <line x1="26" y1="42" x2="74" y2="42" stroke="#00bfff" stroke-width="2"/>
+        <line x1="18" y1="50" x2="82" y2="50" stroke="#00bfff" stroke-width="3"/>
+        <line x1="26" y1="58" x2="74" y2="58" stroke="#00bfff" stroke-width="2"/>
+    </svg>
+
+    <div class="max-w-3xl mx-auto">
+        <div class="border-4 border-black p-6 rounded-3xl bg-white text-center mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-black">Effects of Radiations from Cell Towers on Sleeping Pattern of People Around The Tower</h1>
+            <p class="text-lg mt-1 font-normal text-gray-800">for SATYAJIT's Zoology 6th Semester Project</p>
+
+            <div class="mt-8 flex flex-col items-center">
+                <div class="w-full max-w-sm relative">
+                    <div id="slider-tooltip" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-yellow-400 text-black transition-all duration-300">0</div>
+                    <input type="range" min="0" max="1000" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider">
+                    <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>1000</span></div>
+                </div>
+            </div>
+
+            <div class="mt-6 inline-block border border-gray-300 rounded-xl px-6 py-3 shadow-sm bg-yellow-50">
+                <span class="text-xl font-black text-yellow-600 flex items-center justify-center gap-2">
+                    <svg viewBox="0 0 100 100" class="w-6 h-6"><use href="#satya-coin-template"/></svg>
+                    SATYA Coins Minted: <span id="accumulation">0</span>
+                </span>
+            </div>
+            
+            <div class="mt-6 bg-white border border-gray-200 rounded-xl p-4 max-w-lg mx-auto text-sm md:text-base font-bold text-gray-800 shadow-sm">
+                <p class="mb-2 uppercase tracking-wide text-xs text-gray-500">THE REWARD PROTOCOL</p>
+                <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
+                    <span>1 Valid Submission</span>
+                    <span class="text-yellow-600">+ 10 Coins</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
+                    <span>1 Successful Referral</span>
+                    <span class="text-yellow-600">+ 10 Coins</span>
+                </div>
+                <div class="flex justify-between items-center pt-1">
+                    <span class="text-gray-500">Exchange Rate</span>
+                    <span class="text-green-600">50 Coins = ₹10</span>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t-2 border-dashed border-gray-200">
+                    <p class="font-['Times_New_Roman',_Times,_serif] text-xl font-bold text-black mb-3">Your minimum Target For Withdraw</p>
+                    
+                    <div class="relative w-full h-4 bg-white border-2 border-black rounded-full mb-1">
+                        <div class="absolute top-0 left-0 h-full bg-black rounded-full" style="width: 20%;"></div>
+                        <div class="absolute left-[20%] -translate-x-1/2 -mt-6 border-2 border-black rounded-full px-2 bg-white text-xs font-black">10</div>
+                    </div>
+                    
+                    <div class="flex justify-between text-xs font-black text-black px-1 mb-4">
+                        <span>0</span>
+                        <span>50</span>
+                    </div>
+
+                    <div class="flex justify-center items-center gap-2 text-sm font-bold text-black">
+                        <span class="flex items-center gap-1">10 <svg viewBox="0 0 100 100" class="w-4 h-4"><use href="#satya-coin-template"/></svg> = 2 ₹</span>
+                        <span class="border-l-2 border-black h-8 mx-2"></span>
+                        <div class="flex flex-col text-left text-xs leading-tight font-medium">
+                            <span>collect minimum 10₹</span>
+                            <span class="flex items-center gap-1">to withdraw (50 <svg viewBox="0 0 100 100" class="w-3 h-3"><use href="#satya-coin-template"/></svg>)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="mt-8 text-left text-sm font-['Times_New_Roman',_Times,_serif] font-semibold list-disc list-inside space-y-3 opacity-90 max-w-2xl mx-auto text-gray-900 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <li>This is an unofficial survey reward pool organized by me and u agree to participate with fair intention. U agree to accept upi payment.</li>
+                <li>The deadline might end earlier based on notifications from my authorities on submission of the project. In that case i cant guarantee for completion of prize pool and distribution of reward.</li>
+                <li>Loss of your Hash ID or Failure in submission of it during reward distribution time would result in failure in getting reward.</li>
+                <li>Participating means u agree to comply with these above.</li>
+            </ul>
+        </div>
+
+        <div id="closed-screen" class="glass-panel text-center hidden border-4 border-red-600">
+            <h2 class="text-4xl font-black text-gray-800 mb-4">Survey Closed 🔒</h2>
+            <p class="text-gray-600 mb-2 font-bold text-lg">The deadline for this survey has officially passed.</p>
+            <p class="text-gray-500 mb-6">Thank you to everyone who participated in my Zoology 6th Semester Project research.</p>
+        </div>
+
+        <div id="status-screen" class="glass-panel text-center hidden border-4 border-yellow-400">
+            <h2 class="text-3xl font-black text-gray-800 mb-4" id="status-title">Submission Received!</h2>
+            <p class="text-gray-600 mb-4 font-bold">Your Master Hash ID is:</p>
+            
+            <div title="Click to copy!" class="cursor-pointer text-5xl md:text-6xl font-mono font-black tracking-widest text-yellow-600 p-6 bg-yellow-50 rounded-xl inline-block mb-2 border-2 border-yellow-200 shadow-inner hover:bg-yellow-100 transition" id="user-hash-display">
+                XXXX-XXXX
+            </div>
+            <p class="text-red-600 font-bold text-sm uppercase tracking-wide mb-8">TAKE A SCREENSHOT TO SECURE YOUR COINS.</p>
+
+            <div class="max-w-lg mx-auto mb-10">
+                <div class="flex justify-end pr-4 mb-[-8px] relative z-10">
+                    <span class="text-xs font-black text-black bg-yellow-400 px-3 py-1 rounded-lg border-2 border-black transform rotate-3 shadow-[2px_2px_0px_rgba(0,0,0,1)] flex items-center gap-1">
+                        REFER AND GET 10 coin <svg viewBox="0 0 100 100" class="w-3 h-3"><use href="#satya-coin-template"/></svg> ⤵
+                    </span>
+                </div>
+                <div class="bg-gray-800 border-4 border-gray-900 p-5 rounded-xl shadow-lg relative">
+                    <p class="text-sm font-bold text-yellow-400 uppercase tracking-widest mb-2 text-left">🚀 YOUR PERSONAL AIRDROP LINK</p>
+                    <p class="text-xs text-gray-300 mb-4 text-left">Send this to friends. When they submit, you get 10 SATYA Coins automatically!</p>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="referral-link-input" readonly class="flex-1 bg-gray-900 border-2 border-gray-600 text-sm font-mono text-gray-300 p-3 rounded-lg outline-none selection:bg-yellow-500 selection:text-black">
+                        <button id="copy-ref-btn" class="bg-yellow-500 hover:bg-yellow-600 text-black font-black py-3 px-5 rounded-lg text-sm transition border-2 border-yellow-600">COPY</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t-2 border-dashed border-gray-300 pt-8 mt-2 relative">
+                <h3 class="text-2xl font-black text-gray-800 mb-2 flex items-center justify-center gap-2">
+                    💳 Lock In Your Payout Method 🔒
+                </h3>
+                <p class="text-sm text-gray-500 mb-6 font-bold">Choose your withdrawal method. This cannot be changed later.</p>
+                
+                <div id="payout-container" class="max-w-md mx-auto text-left space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                    <div>
+                        <label class="font-bold text-sm text-gray-700 block mb-2">Select Reward Type: <span class="text-red-500">*</span></label>
+                        <select id="payout_type" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm font-bold bg-white outline-none">
+                            <option value="">Select Method...</option>
+                            <option value="UPI">UPI Transfer</option>
+                            <option value="GooglePlay">Google Play Redeem Code</option>
+                            <option value="Amazon">Amazon Gift Card</option>
+                            <option value="Zomato">Zomato Gift Card</option>
+                        </select>
+                    </div>
+                    <div id="payout-address-group" class="hidden transition-all duration-300">
+                        <label class="font-bold text-sm text-gray-700 block mb-2" id="payout-address-label">Delivery Details:</label>
+                        <input type="text" id="payout_address" placeholder="Enter details..." class="w-full p-3 border border-gray-300 rounded-lg shadow-sm font-mono text-sm outline-none">
+                    </div>
+                    
+                    <button id="save_payout_btn" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-lg mt-4 shadow-md transition disabled:bg-gray-400 disabled:cursor-not-allowed">Secure My Payout Route</button>
+                    <p id="payout-success-msg" class="hidden text-green-600 font-bold text-center mt-3 text-sm">✅ Payout route secured!</p>
+                </div>
+            </div>
+        </div>
+
+        <form id="survey-form" class="hidden">
+            <div class="glass-panel">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 1 - Participant Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="font-bold">Your Name (Completely Optional):</label>
+                        <input type="text" id="participant_code" placeholder="Enter name">
+                    </div>
+                    <div>
+                        <label class="font-bold">Age (years): <span class="text-red-500">*</span></label>
+                        <input type="number" id="age" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="font-bold block mb-2">Gender: <span class="text-red-500">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="gender" value="Male" required> Male</label>
+                        <label><input type="radio" name="gender" value="Female"> Female</label>
+                        <label><input type="radio" name="gender" value="Other"> Other</label>
+                    </div>
+                </div>
+
+                <div class="mb-4 p-4 border rounded-lg bg-gray-50 border-gray-300">
+                    <label class="font-bold block mb-2 text-red-600">Are there any cell towers near your proximity (~50m)? <span class="text-red-500">*</span></label>
+                    <div class="radio-group mb-4">
+                        <label><input type="radio" name="tower_proximity" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="tower_proximity" value="No"> No</label>
+                    </div>
+
+                    <div id="if-no-group" class="pl-4 border-l-4 border-blue-400 mb-6 transition-opacity duration-300 opacity-30 pointer-events-none">
+                        <p class="font-bold text-blue-600 text-sm mb-2">If NO:</p>
+                        <label class="mt-2 block font-bold text-sm">Approximate distance from nearest tower (m): <span class="text-gray-500 font-normal italic">(write "far" or "close" if you are not sure of distance)</span></label>
+                        <input type="text" id="no_distance">
+                    </div>
+
+                    <div id="if-yes-group" class="pl-4 border-l-4 border-red-400 mb-4 transition-opacity duration-300 opacity-30 pointer-events-none">
+                        <p class="font-bold text-red-600 text-sm mb-2">If YES:</p>
+                        <label class="font-bold">Years living within 50 m of the tower (hostel, chamber, house, at relatives) (years): <span class="text-red-500 hidden" id="req_yes_years">*</span></label>
+                        <input type="number" id="yes_years">
+                        <label class="mt-2 block font-bold text-sm">Approximate distance from tower (meters): <span class="text-gray-500 font-normal italic">(write "far" or "close" if you are not sure of distance)</span></label>
+                        <input type="text" id="yes_distance">
+                    </div>
+
+                    <label class="font-bold block mt-6">Other significant RF exposure at home (Wi-Fi hotspot, routers, etc.)? <span class="text-red-500">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="other_rf" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="other_rf" value="No"> No</label>
+                    </div>
+                    <label class="block mt-2 text-sm text-gray-500 font-bold">If yes, specify: <span class="text-red-500 hidden" id="req_rf_specify">*</span></label>
+                    <input type="text" id="other_rf_specify" class="opacity-50 pointer-events-none bg-gray-100 transition-opacity">
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 2 - Sleep Patterns (PSQI-based)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="font-bold">Usual bedtime: <span class="text-red-500">*</span></label>
+                        <input type="time" id="bedtime" required>
+                    </div>
+                    <div>
+                        <label class="font-bold">Usual wake-up time: <span class="text-red-500">*</span></label>
+                        <input type="time" id="waketime" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="font-bold">Average total sleep per night (hours): <span class="text-red-500">*</span></label>
+                    <input type="number" step="0.5" id="total_sleep" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="font-bold block mb-2">How long (minutes) does it take you to fall asleep? <span class="text-red-500">*</span></label>
+                    <select id="fall_asleep_time" required>
+                        <option value="">Select...</option>
+                        <option value="< 15 mins">< 15 mins</option>
+                        <option value="15 - 30 mins">15 - 30 mins</option>
+                        <option value="31 - 60 mins">31 - 60 mins</option>
+                        <option value="> 60 mins">> 60 mins</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 3 - Sleep Quality & Disturbances</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="font-bold block mb-2">Overall, how would you rate your sleep quality? <span class="text-red-500">*</span></label>
+                        <select id="sleep_quality" required>
+                            <option value="">Select...</option>
+                            <option value="Very good">Very good</option>
+                            <option value="Fairly good">Fairly good</option>
+                            <option value="Fairly bad">Fairly bad</option>
+                            <option value="Very bad">Very bad</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold block mb-2">Do you wake up in the night? <span class="text-red-500">*</span></label>
+                        <select id="wake_night" required>
+                            <option value="">Select...</option>
+                            <option value="Not at all">Not at all</option>
+                            <option value="Less than once a week">Less than once a week</option>
+                            <option value="Once/twice per week">Once/twice per week</option>
+                            <option value="≥3 times per week">≥3 times per week</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold block mb-2">Trouble staying asleep because of nightmares, pain, or discomfort? <span class="text-red-500">*</span></label>
+                        <select id="trouble_staying_asleep" required>
+                            <option value="">Select...</option>
+                            <option value="Not at all">Not at all</option>
+                            <option value="Less than once a week">Less than once a week</option>
+                            <option value="Once/twice per week">Once/twice per week</option>
+                            <option value="≥3 times per week">≥3 times per week</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-bold block mb-2">Do you take any medicine to help you sleep? <span class="text-red-500">*</span></label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="medicine" value="Yes" required> Yes</label>
+                            <label><input type="radio" name="medicine" value="No"> No</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-bold block mb-2">Felt sleepy during the day / trouble concentrating due to lack of sleep? <span class="text-red-500">*</span></label>
+                        <select id="daytime_sleepiness" required>
+                            <option value="">Select...</option>
+                            <option value="Not at all">Not at all</option>
+                            <option value="Less than once a week">Less than once a week</option>
+                            <option value="Once/twice per week">Once/twice per week</option>
+                            <option value="≥3 times per week">≥3 times per week</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 4 - Perceived Radiation Effects</h2>
+                
+                <div class="mb-4">
+                    <label class="font-bold block mb-2">Do you feel that living near the tower affects your sleep? <span class="text-red-500">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="affects_sleep" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="affects_sleep" value="No"> No</label>
+                    </div>
+                    <label class="block mt-2 text-sm text-gray-500 font-bold">If yes, describe what you experience: <span class="text-red-500 hidden" id="req_affects_desc">*</span> <span class="italic text-gray-400 font-normal hidden" id="hint_affects_desc">(Write 'Idk' if you are unsure)</span></label>
+                    <textarea id="affects_sleep_desc" rows="2" class="opacity-50 pointer-events-none transition-opacity bg-gray-100"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="font-bold block mb-2">Experience physical symptoms (headache, dizziness) related to sleep problems? <span class="text-red-500">*</span></label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="physical_symptoms" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="physical_symptoms" value="No"> No</label>
+                    </div>
+                    <label class="block mt-2 text-sm text-gray-500 font-bold">If yes, specify: <span class="text-red-500 hidden" id="req_physical_desc">*</span> <span class="italic text-gray-400 font-normal hidden" id="hint_physical_desc">(Write 'Idk' if you are unsure)</span></label>
+                    <textarea id="physical_symptoms_desc" rows="2" class="opacity-50 pointer-events-none transition-opacity bg-gray-100"></textarea>
+                </div>
+
+                <div class="mb-6 pt-4 border-t border-gray-200">
+                    <label class="font-bold block mb-2">Does sleeping with your Mobile data on near your bed-side gives you discomfort in sleep or weird dreams? <span class="text-red-500">*</span></label>
+                    <div class="radio-group flex gap-4">
+                        <label><input type="radio" name="mobile_data_discomfort" value="Yes" required> Yes</label>
+                        <label><input type="radio" name="mobile_data_discomfort" value="No"> No</label>
+                        <label><input type="radio" name="mobile_data_discomfort" value="Sometimes"> Sometimes</label>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-300">
+                    <label class="flex items-start space-x-3 cursor-pointer">
+                        <input type="checkbox" id="confirm_checkbox" class="mt-1 w-6 h-6 border-gray-300 rounded text-black focus:ring-black">
+                        <span class="text-sm font-bold text-gray-800">I confirm that all responses provided are accurate and I agree to the terms of Satyajit's prize pool.</span>
+                    </label>
+                    <button type="submit" id="submit_btn" class="w-full bg-gray-400 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all duration-300 mt-4 cursor-not-allowed opacity-70" disabled>
+                        Submit & Mint Coins
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4').then(FingerprintJS => FingerprintJS.load());</script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+        // =========================================================================
+        // SATORU SIR, PASTE YOUR FIREBASE CONFIG HERE
+        // =========================================================================
+        const firebaseConfig = {
+          apiKey: "AIzaSyBP3LSQMspafVMkfeX7Jze2ESdl2szJq6c",
+            authDomain: "prototype-rfr-sp.firebaseapp.com",
+            projectId: "prototype-rfr-sp",
+            storageBucket: "prototype-rfr-sp.firebasestorage.app",
+            messagingSenderId: "734670936120",
+            appId: "1:734670936120:web:d0bae39a603a87e0eaaecd",
+            measurementId: "G-NS8621BQLJ"
+        };
+        // =========================================================================
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // UI Variables
+        const form = document.getElementById('survey-form');
+        const statusScreen = document.getElementById('status-screen');
+        const closedScreen = document.getElementById('closed-screen');
+        const userHashDisplay = document.getElementById('user-hash-display');
+        const accumulationDisplay = document.getElementById('accumulation');
+        const statusTitle = document.getElementById('status-title');
+        const slider = document.getElementById('progress-slider');
+        const sliderTooltip = document.getElementById('slider-tooltip');
+        
+        // Payout Variables
+        const payoutType = document.getElementById('payout_type');
+        const payoutAddressGroup = document.getElementById('payout-address-group');
+        const payoutAddressLabel = document.getElementById('payout-address-label');
+        const payoutAddressInput = document.getElementById('payout_address');
+        const savePayoutBtn = document.getElementById('save_payout_btn');
+        const payoutSuccessMsg = document.getElementById('payout-success-msg');
+        
+        // Referral Setup
+        const refInput = document.getElementById('referral-link-input');
+        const copyRefBtn = document.getElementById('copy-ref-btn');
+        const urlParams = new URLSearchParams(window.location.search);
+        const referredByHash = urlParams.get('ref') || "None";
+        let globalDeviceID = "";
+
+        // Time-Bomb
+        const deadline = new Date("March 30, 2026 23:59:59 GMT+0530").getTime();
+        const isSurveyClosed = new Date().getTime() > deadline;
+
+        // Confirmation Checkbox
+        const confirmCheckbox = document.getElementById('confirm_checkbox');
+        const submitBtn = document.getElementById('submit_btn');
+        confirmCheckbox.addEventListener('change', function() {
+            if(this.checked) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed', 'opacity-70');
+                submitBtn.classList.add('bg-black', 'hover:bg-gray-800');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed', 'opacity-70');
+                submitBtn.classList.remove('bg-black', 'hover:bg-gray-800');
+            }
+        });
+
+        // UI Greying Logic
+        const proxRadios = document.querySelectorAll('input[name="tower_proximity"]');
+        const ifNoGroup = document.getElementById('if-no-group');
+        const ifYesGroup = document.getElementById('if-yes-group');
+        const yesYears = document.getElementById('yes_years');
+        const reqYesYears = document.getElementById('req_yes_years');
+
+        proxRadios.forEach(radio => radio.addEventListener('change', (e) => {
+            if (e.target.value === 'Yes') {
+                ifYesGroup.classList.remove('opacity-30', 'pointer-events-none');
+                ifNoGroup.classList.add('opacity-30', 'pointer-events-none');
+                yesYears.required = true; reqYesYears.classList.remove('hidden');
+            } else {
+                ifNoGroup.classList.remove('opacity-30', 'pointer-events-none');
+                ifYesGroup.classList.add('opacity-30', 'pointer-events-none');
+                yesYears.required = false; reqYesYears.classList.add('hidden'); yesYears.value = '';
+            }
+        }));
+
+        const rfRadios = document.querySelectorAll('input[name="other_rf"]');
+        const rfSpecify = document.getElementById('other_rf_specify');
+        const reqRfSpecify = document.getElementById('req_rf_specify');
+
+        rfRadios.forEach(radio => radio.addEventListener('change', (e) => {
+            if(e.target.value === 'Yes') {
+                rfSpecify.required = true; rfSpecify.classList.remove('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqRfSpecify.classList.remove('hidden');
+            } else {
+                rfSpecify.required = false; rfSpecify.classList.add('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqRfSpecify.classList.add('hidden'); rfSpecify.value = '';
+            }
+        }));
+
+        const affectsRadios = document.querySelectorAll('input[name="affects_sleep"]');
+        const affectsDesc = document.getElementById('affects_sleep_desc');
+        const reqAffects = document.getElementById('req_affects_desc');
+        const hintAffects = document.getElementById('hint_affects_desc');
+
+        affectsRadios.forEach(r => r.addEventListener('change', (e) => {
+            if(e.target.value === 'Yes') {
+                affectsDesc.required = true; affectsDesc.classList.remove('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqAffects.classList.remove('hidden'); hintAffects.classList.remove('hidden');
+            } else {
+                affectsDesc.required = false; affectsDesc.classList.add('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqAffects.classList.add('hidden'); hintAffects.classList.add('hidden'); affectsDesc.value = '';
+            }
+        }));
+
+        const physRadios = document.querySelectorAll('input[name="physical_symptoms"]');
+        const physDesc = document.getElementById('physical_symptoms_desc');
+        const reqPhys = document.getElementById('req_physical_desc');
+        const hintPhys = document.getElementById('hint_physical_desc');
+
+        physRadios.forEach(r => r.addEventListener('change', (e) => {
+            if(e.target.value === 'Yes') {
+                physDesc.required = true; physDesc.classList.remove('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqPhys.classList.remove('hidden'); hintPhys.classList.remove('hidden');
+            } else {
+                physDesc.required = false; physDesc.classList.add('opacity-50', 'pointer-events-none', 'bg-gray-100');
+                reqPhys.classList.add('hidden'); hintPhys.classList.add('hidden'); physDesc.value = '';
+            }
+        }));
+
+        // Payout UI Logic
+        payoutType.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if(!val) {
+                payoutAddressGroup.classList.add('hidden');
+                return;
+            }
+            payoutAddressGroup.classList.remove('hidden');
+            if(val === 'UPI') {
+                payoutAddressLabel.innerText = "Enter your exact UPI ID:";
+                payoutAddressInput.placeholder = "e.g. name@ybl";
+            } else if (val === 'GooglePlay') {
+                payoutAddressLabel.innerText = "Email address for Code Delivery:";
+                payoutAddressInput.placeholder = "e.g. gamer@gmail.com";
+            } else {
+                payoutAddressLabel.innerText = "Email address or Phone for Gift Card:";
+                payoutAddressInput.placeholder = "Enter delivery detail...";
+            }
+        });
+
+        // Hash Generator
+        function generateRewardHash() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i=0; i<4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            result += '-';
+            for (let i=0; i<4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            return result;
+        }
+
+        let currentHash = "";
+        
+        // Copy Functions
+        userHashDisplay.addEventListener('click', () => {
+            if(!currentHash) return;
+            navigator.clipboard.writeText(currentHash);
+            userHashDisplay.innerText = "COPIED!";
+            setTimeout(() => { userHashDisplay.innerText = currentHash; }, 1500);
+        });
+
+        copyRefBtn.addEventListener('click', () => {
+            if(!refInput.value) return;
+            navigator.clipboard.writeText(refInput.value);
+            copyRefBtn.innerText = "COPIED!";
+            copyRefBtn.classList.replace('bg-yellow-500', 'bg-green-500');
+            setTimeout(() => { 
+                copyRefBtn.innerText = "COPY"; 
+                copyRefBtn.classList.replace('bg-green-500', 'bg-yellow-500');
+            }, 2000);
+        });
+
+        function populateSuccessData(hash, pMethod, pAddress) {
+            currentHash = hash;
+            userHashDisplay.innerText = currentHash;
+            
+            // Build absolute dynamic referral URL
+            const urlData = new URL(window.location.href);
+            const baseUrl = urlData.origin + urlData.pathname;
+            refInput.value = `${baseUrl}?ref=${currentHash}`;
+
+            // Lock payout if already submitted
+            if (pMethod) {
+                payoutType.value = pMethod;
+                payoutType.disabled = true;
+                payoutAddressInput.value = pAddress || "";
+                payoutAddressInput.disabled = true;
+                payoutAddressGroup.classList.remove('hidden');
+                savePayoutBtn.disabled = true;
+                savePayoutBtn.innerText = "Locked";
+                payoutSuccessMsg.classList.remove('hidden');
+            }
+        }
+
+        // Live Counter (Minted Coins)
+        onSnapshot(collection(db, "submissions"), (snapshot) => {
+            const count = snapshot.size;
+            accumulationDisplay.innerText = count * 10;
+            slider.value = count;
+            sliderTooltip.innerText = count;
+            const percent = (count / 1000) * 100;
+            sliderTooltip.style.left = `calc(${percent}% + (${8 - percent * 0.15}px))`;
+        });
+
+        // =========================================================================
+        // CORE INITIALIZATION
+        // =========================================================================
+        
+        if (isSurveyClosed) {
+            closedScreen.classList.remove('hidden');
+        } else {
+            fpPromise.then(fp => fp.get()).then(async (result) => {
+                globalDeviceID = result.visitorId;
+                const docRef = doc(db, "submissions", globalDeviceID);
+                
+                let docSnap = null;
+                try { docSnap = await getDoc(docRef); } catch(e) { console.warn("Firebase Read Error"); }
+
+                if (docSnap && docSnap.exists()) {
+                    form.classList.add('hidden'); 
+                    statusScreen.classList.remove('hidden');
+                    statusTitle.innerText = "You Already Submitted!";
+                    
+                    const data = docSnap.data();
+                    populateSuccessData(data.rewardHash, data.payoutMethod, data.payoutAddress);
+                } else {
+                    form.classList.remove('hidden');
+                }
+
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if(!confirmCheckbox.checked) return;
+
+                    const newHash = generateRewardHash();
+                    const payload = {
+                        rewardHash: newHash, 
+                        referredBy: referredByHash, 
+                        payoutMethod: "", 
+                        payoutAddress: "", 
+                        timestamp: new Date().toISOString(),
+                        participant_code: document.getElementById('participant_code').value || 'N/A',
+                        age: document.getElementById('age').value,
+                        gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
+                        tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
+                        no_years: 'N/A', 
+                        no_distance: document.getElementById('no_distance').value || 'N/A',
+                        yes_years: document.getElementById('yes_years').value || 'N/A',
+                        yes_distance: document.getElementById('yes_distance').value || 'N/A',
+                        other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
+                        other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
+                        bedtime: document.getElementById('bedtime').value || 'N/A',
+                        waketime: document.getElementById('waketime').value || 'N/A',
+                        total_sleep: document.getElementById('total_sleep').value || 'N/A',
+                        fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
+                        sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
+                        wake_night: document.getElementById('wake_night').value || 'N/A',
+                        trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
+                        medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
+                        daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
+                        affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
+                        affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
+                        physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
+                        physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
+                        mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
+                    };
+
+                    try {
+                        submitBtn.innerText = "Minting...";
+                        await setDoc(doc(db, "submissions", globalDeviceID), payload);
+                        
+                        form.classList.add('hidden'); 
+                        statusScreen.classList.remove('hidden');
+                        statusTitle.innerText = "Submission Received!"; 
+                        populateSuccessData(newHash, "", "");
+                        
+                    } catch (error) {
+                        alert("Error saving data. Check your connection.");
+                        submitBtn.innerText = "Submit & Mint Coins";
+                    }
+                });
+
+                // Handle Payout Form Submission
+                savePayoutBtn.addEventListener('click', async () => {
+                    const method = payoutType.value;
+                    const address = payoutAddressInput.value;
+
+                    if(!method || !address) {
+                        alert("Please select a method and enter your details.");
+                        return;
+                    }
+
+                    savePayoutBtn.innerText = "Securing...";
+                    try {
+                        await updateDoc(doc(db, "submissions", globalDeviceID), {
+                            payoutMethod: method,
+                            payoutAddress: address
+                        });
+                        
+                        savePayoutBtn.innerText = "Locked";
+                        savePayoutBtn.disabled = true;
+                        payoutType.disabled = true;
+                        payoutAddressInput.disabled = true;
+                        payoutSuccessMsg.classList.remove('hidden');
+
+                    } catch (error) {
+                        alert("Failed to save payout route. Please try again.");
+                        savePayoutBtn.innerText = "Secure My Payout Route";
+                    }
+                });
+
+            }).catch(e => {
+                form.classList.remove('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
