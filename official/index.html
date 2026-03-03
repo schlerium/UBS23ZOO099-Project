@@ -65,20 +65,20 @@
             <div class="mt-8 flex flex-col items-center">
                 <div class="w-full max-w-sm relative">
                     <div id="slider-tooltip-header" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-white transition-all duration-300">0</div>
-                    <input type="range" min="0" max="250" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-header">
-                    <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>250</span></div>
+                    <input type="range" min="0" max="50" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-header">
+                    <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>50</span></div>
                 </div>
             </div>
 
             <div class="flex justify-center items-center space-x-8 mt-10 mb-8 text-6xl">
-                <span>📡</span>
+                <span>📡</span>    
                 <span class="text-red-600 font-bold text-5xl">❓</span>
                 <span>🛌🏽</span>
             </div>
 
             <ul class="mt-8 text-left text-base md:text-lg font-['Times_New_Roman',_Times,_serif] list-disc list-inside bg-gray-50 p-6 rounded-xl border border-gray-200">
-                <li>I am Satyajit and I am doing this survey to study whether the proximity to cell towers and exposure to similar radio frequency have an effect on the person's sleep cycle. For my research I need a minimal of 250 people's dataset as my sample. SO kindly contribute to it and Share as much u can :)</li>
-            </ul>
+                <li>I am Satyajit and I am doing this survey to study whether the proximity to cell towers and exposure to similar radio frequency have an effect on the person's sleep cycle. For my research I need a minimal of 50 people's dataset as my sample. SO kindly contribute to it and Share as much u can :)</li>
+            </ul>                
         </div>
 
         <div id="status-screen" class="hidden border-4 border-black rounded-3xl bg-white text-center py-16 px-4 flex flex-col justify-center items-center min-h-[60vh] mb-8 shadow-sm">
@@ -92,8 +92,8 @@
 
             <div class="w-full max-w-sm relative mt-4">
                 <div id="slider-tooltip-status" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-white transition-all duration-300">0</div>
-                <input type="range" min="0" max="250" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-status">
-                <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>250</span></div>
+                <input type="range" min="0" max="50" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-status">
+                <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>50</span></div>
             </div>
 
             <p class="mt-12 text-[10px] text-gray-500 opacity-50 italic tracking-wide select-none">I owe u a snack or something. reach me for that ;)</p>
@@ -480,12 +480,12 @@
 
             sliderHeader.value = count;
             tooltipHeader.innerText = count;
-            const pHead = (count / 250) * 100;
+            const pHead = (count / 50) * 100;
             tooltipHeader.style.left = `calc(${pHead}% + (${8 - pHead * 0.15}px))`;
 
             sliderStatus.value = count;
             tooltipStatus.innerText = count;
-            const pStat = (count / 250) * 100;
+            const pStat = (count / 50) * 100;
             tooltipStatus.style.left = `calc(${pStat}% + (${8 - pStat * 0.15}px))`;
         });
 
