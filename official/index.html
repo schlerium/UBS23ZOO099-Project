@@ -13,50 +13,14 @@
         input[type="text"], input[type="number"], input[type="time"], select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
         .radio-group label { margin-right: 1rem; cursor: pointer; }
         input[type=range]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #fff; box-shadow: 0 0 2px rgba(0,0,0,0.5); }
-        
-        /* CINEMATIC WELCOME ANIMATIONS */
-        @keyframes slideBar {
-            0% { transform: translateX(-150vw); }
-            100% { transform: translateX(150vw); }
-        }
-        .anim-bar {
-            position: absolute;
-            background: #111;
-            border-radius: 9999px;
-            animation: slideBar 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes textPop {
-            0% { opacity: 0; transform: scale(0.9); }
-            30% { opacity: 1; transform: scale(1.05); }
-            70% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.95); }
-        }
-        .anim-text {
-            animation: textPop 2.2s ease-in-out forwards;
-            opacity: 0;
-        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="welcome-overlay" class="fixed inset-0 z-50 bg-white flex items-center justify-center hidden transition-opacity duration-500">
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="anim-bar h-3 w-1/3 top-[15%]" style="animation-delay: 0.1s"></div>
-            <div class="anim-bar h-5 w-1/2 top-[25%]" style="animation-delay: 0.3s"></div>
-            <div class="anim-bar h-2 w-2/5 top-[35%]" style="animation-delay: 0.2s"></div>
-            <div class="anim-bar h-6 w-3/4 top-[65%]" style="animation-delay: 0.4s"></div>
-            <div class="anim-bar h-3 w-1/4 top-[80%]" style="animation-delay: 0.15s"></div>
-            <div class="anim-bar h-4 w-2/3 top-[90%]" style="animation-delay: 0.35s"></div>
-        </div>
-        <h1 class="anim-text text-5xl md:text-7xl font-black text-gray-400 tracking-widest uppercase z-10" style="font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;">
-            WELCOME
-        </h1>
-    </div>
-
     <div class="max-w-3xl mx-auto">
-        <div id="survey-header" class="border-4 border-black p-6 md:p-10 rounded-3xl bg-white text-center mb-8 hidden">
+        <div id="survey-header" class="border-4 border-black p-6 md:p-10 rounded-3xl bg-white text-center mb-8">
             <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-black">Effects of Radiations from Cell Towers on Sleeping Pattern of People Around The Tower</h1>
-            <p class="text-lg mt-2 font-normal text-gray-800">for SATYAJIT's Zoology 6th Semester Project</p>
+            <p class="text-lg mt-2 font-normal text-gray-800">for Satyajit's Zoology 6th Semester Project</p>
 
             <div class="mt-8 inline-block border border-gray-200 rounded-xl px-8 py-3 shadow-sm bg-white">
                 <span class="text-2xl font-bold text-black">Participants: <span id="participant-counter">0</span></span>
@@ -70,14 +34,8 @@
                 </div>
             </div>
 
-            <div class="flex justify-center items-center space-x-8 mt-10 mb-8 text-6xl">
-                <span>📡</span>    
-                <span class="text-red-600 font-bold text-5xl">❓</span>
-                <span>🛌🏽</span>
-            </div>
-
             <ul class="mt-8 text-left text-base md:text-lg font-['Times_New_Roman',_Times,_serif] list-disc list-inside bg-gray-50 p-6 rounded-xl border border-gray-200">
-                <li>I am Satyajit and I am doing this survey to study whether the proximity to cell towers and exposure to similar radio frequency have an effect on the person's sleep cycle. For my research I need a minimal of 50 people's dataset as my sample. SO kindly contribute to it and Share as much u can :)</li>
+                <li>I am Satyajit and I am doing this survey to study whether the proximity to cell towers and exposure to similar radio frequency have an effect on the person's sleep cycle. For my research I need a minimal of 50 people's dataset as my sample. So kindly contribute to it and share this survey.</li>
             </ul>                
         </div>
 
@@ -87,7 +45,7 @@
             </h2>
             <div class="border border-gray-200 rounded-xl px-10 py-4 bg-white shadow-sm inline-block mb-10">
                 <p class="text-xl md:text-2xl font-['Times_New_Roman',_Times,_serif] text-black font-bold">Response Submitted</p>
-                <p id="nth-person-text" class="text-sm font-['Times_New_Roman',_Times,_serif] text-gray-800 mt-3">You are the nth person to help me in this project 🗿🤝</p>
+                <p id="nth-person-text" class="text-sm font-['Times_New_Roman',_Times,_serif] text-gray-800 mt-3">You are the nth person to help me in this project.</p>
             </div>
 
             <div class="w-full max-w-sm relative mt-4">
@@ -96,18 +54,15 @@
                 <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>50</span></div>
             </div>
 
-            <p class="mt-12 text-[10px] text-gray-500 opacity-50 italic tracking-wide select-none">I owe u a snack or something. reach me for that ;)</p>
-
-            <button id="native-share-btn" class="mt-6 flex items-center justify-center gap-2 mx-auto bg-white border-2 border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-black font-bold py-3 px-6 rounded-xl transition-all shadow-sm active:scale-95">
+            <button id="native-share-btn" class="mt-12 flex items-center justify-center gap-2 mx-auto bg-white border-2 border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-black font-bold py-3 px-6 rounded-xl transition-all shadow-sm active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
                 </svg>
-                Share to Others 🙂pls
+                Share to Others
             </button>
         </div>
 
-        <form id="survey-form" class="hidden">
-            
+        <form id="survey-form">
             <div class="glass-panel">
                 <h2 class="text-xl font-bold border-b pb-2 mb-4">Section 1 - Participant Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -145,7 +100,7 @@
 
                     <div id="if-yes-group" class="pl-4 border-l-4 border-red-400 mb-4 transition-opacity duration-300 opacity-30 pointer-events-none">
                         <p class="font-bold text-red-600 text-sm mb-2">If YES:</p>
-                        <label class="font-bold">Years living within 50 m of the tower (hostel, chamber, house, at relatives) (years): <span class="text-red-500 hidden" id="req_yes_years">*</span></label>
+                        <label class="font-bold">Years living within 50 m of the tower (years): <span class="text-red-500 hidden" id="req_yes_years">*</span></label>
                         <input type="number" id="yes_years">
                         <label class="mt-2 block font-bold text-sm">Approximate distance from tower (meters): <span class="text-gray-500 font-normal italic">(write "far" or "close" if you are not sure of distance)</span></label>
                         <input type="text" id="yes_distance">
@@ -294,9 +249,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, addDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-        // =========================================================================
-        // SATORU SIR, PASTE YOUR FIREBASE CONFIG HERE
-        // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyBP3LSQMspafVMkfeX7Jze2ESdl2szJq6c",
             authDomain: "prototype-rfr-sp.firebaseapp.com",
@@ -306,28 +258,25 @@
             appId: "1:734670936120:web:d0bae39a603a87e0eaaecd",
             measurementId: "G-NS8621BQLJ"
         };
-        // =========================================================================
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // UI Variables
         const form = document.getElementById('survey-form');
         const header = document.getElementById('survey-header');
         const statusScreen = document.getElementById('status-screen');
         const counterDisplay = document.getElementById('participant-counter');
         const nthPersonText = document.getElementById('nth-person-text');
         const shareBtn = document.getElementById('native-share-btn');
-        const welcomeOverlay = document.getElementById('welcome-overlay');
         
         const sliderHeader = document.getElementById('progress-slider-header');
         const tooltipHeader = document.getElementById('slider-tooltip-header');
         const sliderStatus = document.getElementById('progress-slider-status');
         const tooltipStatus = document.getElementById('slider-tooltip-status');
         
-        // Confirmation Checkbox
         const confirmCheckbox = document.getElementById('confirm_checkbox');
         const submitBtn = document.getElementById('submit_btn');
+
         confirmCheckbox.addEventListener('change', function() {
             if(this.checked) {
                 submitBtn.disabled = false;
@@ -340,7 +289,6 @@
             }
         });
 
-        // Section 1 UI Greying
         const proxRadios = document.querySelectorAll('input[name="tower_proximity"]');
         const ifNoGroup = document.getElementById('if-no-group');
         const ifYesGroup = document.getElementById('if-yes-group');
@@ -412,198 +360,122 @@
             return n + "th";
         }
 
-        // ==========================================================
-        // WELCOME ANIMATION LOGIC
-        // ==========================================================
-        function playWelcomeAnimation(callback) {
-            welcomeOverlay.classList.remove('hidden');
-            
-            // Wait for animations to finish, then fade out the overlay
-            setTimeout(() => {
-                welcomeOverlay.classList.add('opacity-0');
-                setTimeout(() => {
-                    welcomeOverlay.classList.add('hidden');
-                    callback();
-                }, 500); // Wait for opacity transition
-            }, 2400); // Time to let the text pop and bars slide
-        }
-
-        // ==========================================================
-        // SHARE BUTTON LOGIC (Web Share API)
-        // ==========================================================
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
                 const shareUrl = 'https://schlerium.github.io/UBS23ZOO099-Project/official/';
-                
                 if (navigator.share) {
                     try {
                         await navigator.share({
                             title: 'Sleep Pattern Survey',
-                            text: 'Hey! Help Satyajit out with his 6th Semester Zoology project by taking this quick survey.',
+                            text: 'Help Satyajit out with his 6th Semester Zoology project by taking this quick survey.',
                             url: shareUrl
                         });
-                    } catch (err) {
-                        console.log('Share cancelled.');
-                    }
+                    } catch (err) {}
                 } else {
                     navigator.clipboard.writeText(shareUrl);
                     const originalHTML = shareBtn.innerHTML;
-                    shareBtn.innerHTML = "✅ Link Copied!";
+                    shareBtn.innerHTML = "Link Copied!";
                     setTimeout(() => { shareBtn.innerHTML = originalHTML; }, 2000);
                 }
             });
         }
 
-        // ==========================================================
-        // SUCCESS SCREEN LOGIC (Always Fires Confetti Now)
-        // ==========================================================
         function showSuccessScreen(rank) {
             form.classList.add('hidden'); 
             header.classList.add('hidden'); 
             statusScreen.classList.remove('hidden');
-            nthPersonText.innerText = `You are the ${getOrdinal(rank)} person to help me in this project 🗿🤝`;
-
+            nthPersonText.innerText = `You are the ${getOrdinal(rank)} person to help me in this project.`;
             if (typeof confetti === "function") {
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    disableForReducedMotion: true
-                });
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, disableForReducedMotion: true });
             }
         }
 
-        // Live Counters 
         onSnapshot(collection(db, "submissions"), (snapshot) => {
             const count = snapshot.size;
             counterDisplay.innerText = count;
-
             sliderHeader.value = count;
             tooltipHeader.innerText = count;
             const pHead = (count / 50) * 100;
             tooltipHeader.style.left = `calc(${pHead}% + (${8 - pHead * 0.15}px))`;
-
             sliderStatus.value = count;
             tooltipStatus.innerText = count;
             const pStat = (count / 50) * 100;
             tooltipStatus.style.left = `calc(${pStat}% + (${8 - pStat * 0.15}px))`;
         });
 
-        // Memory Check
         let localSubmitted = false;
         let localRank = null;
         try {
             localSubmitted = localStorage.getItem("satyajit_official_submitted") === "true";
             localRank = localStorage.getItem("satyajit_locked_rank");
-        } catch(e) {
-            console.warn("Browser blocked LocalStorage.");
-        }
+        } catch(e) {}
 
-        function attachSubmitLogic() {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if(!confirmCheckbox.checked) return;
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!confirmCheckbox.checked) return;
 
-                const currentCount = parseInt(counterDisplay.innerText) || 0;
-                const myAssignedNumber = currentCount + 1;
+            const currentCount = parseInt(counterDisplay.innerText) || 0;
+            const myAssignedNumber = currentCount + 1;
 
-                const payload = {
-                    rewardHash: "CONTINGENCY-NO-HASH", 
-                    participantNumber: myAssignedNumber,
-                    timestamp: new Date().toISOString(),
-                    participant_code: document.getElementById('participant_code').value || 'N/A',
-                    age: document.getElementById('age').value,
-                    gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
-                    tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
-                    no_years: 'N/A', 
-                    no_distance: document.getElementById('no_distance').value || 'N/A',
-                    yes_years: document.getElementById('yes_years').value || 'N/A',
-                    yes_distance: document.getElementById('yes_distance').value || 'N/A',
-                    other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
-                    other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
-                    bedtime: document.getElementById('bedtime').value || 'N/A',
-                    waketime: document.getElementById('waketime').value || 'N/A',
-                    total_sleep: document.getElementById('total_sleep').value || 'N/A',
-                    fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
-                    sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
-                    wake_night: document.getElementById('wake_night').value || 'N/A',
-                    trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
-                    medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
-                    daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
-                    affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
-                    affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
-                    physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
-                    physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
-                    mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
-                };
+            const payload = {
+                rewardHash: "CONTINGENCY-NO-HASH", 
+                participantNumber: myAssignedNumber,
+                timestamp: new Date().toISOString(),
+                participant_code: document.getElementById('participant_code').value || 'N/A',
+                age: document.getElementById('age').value,
+                gender: document.querySelector('input[name="gender"]:checked')?.value || 'N/A',
+                tower_proximity: document.querySelector('input[name="tower_proximity"]:checked')?.value || 'N/A',
+                no_distance: document.getElementById('no_distance').value || 'N/A',
+                yes_years: document.getElementById('yes_years').value || 'N/A',
+                yes_distance: document.getElementById('yes_distance').value || 'N/A',
+                other_rf: document.querySelector('input[name="other_rf"]:checked')?.value || 'N/A',
+                other_rf_specify: document.getElementById('other_rf_specify').value || 'N/A',
+                bedtime: document.getElementById('bedtime').value || 'N/A',
+                waketime: document.getElementById('waketime').value || 'N/A',
+                total_sleep: document.getElementById('total_sleep').value || 'N/A',
+                fall_asleep_time: document.getElementById('fall_asleep_time').value || 'N/A',
+                sleep_quality: document.getElementById('sleep_quality').value || 'N/A',
+                wake_night: document.getElementById('wake_night').value || 'N/A',
+                trouble_staying_asleep: document.getElementById('trouble_staying_asleep').value || 'N/A',
+                medicine: document.querySelector('input[name="medicine"]:checked')?.value || 'N/A',
+                daytime_sleepiness: document.getElementById('daytime_sleepiness').value || 'N/A',
+                affects_sleep: document.querySelector('input[name="affects_sleep"]:checked')?.value || 'N/A',
+                affects_sleep_desc: document.getElementById('affects_sleep_desc').value || 'N/A',
+                physical_symptoms: document.querySelector('input[name="physical_symptoms"]:checked')?.value || 'N/A',
+                physical_symptoms_desc: document.getElementById('physical_symptoms_desc').value || 'N/A',
+                mobile_data_discomfort: document.querySelector('input[name="mobile_data_discomfort"]:checked')?.value || 'N/A'
+            };
 
+            try {
+                submitBtn.innerText = "Submitting...";
+                await addDoc(collection(db, "submissions"), payload);
                 try {
-                    submitBtn.innerText = "Submitting...";
-                    
-                    await addDoc(collection(db, "submissions"), payload);
-                    
-                    try {
-                        localStorage.setItem("satyajit_official_submitted", "true");
-                        localStorage.setItem("satyajit_locked_rank", myAssignedNumber);
-                    } catch(e) {}
-                    
-                    showSuccessScreen(myAssignedNumber);
-                    
-                } catch (error) {
-                    alert("Error saving data. Check your connection.");
-                    submitBtn.innerText = "Submit response";
-                }
-            });
-        }
+                    localStorage.setItem("satyajit_official_submitted", "true");
+                    localStorage.setItem("satyajit_locked_rank", myAssignedNumber);
+                } catch(e) {}
+                showSuccessScreen(myAssignedNumber);
+            } catch (error) {
+                alert("Error saving data.");
+                submitBtn.innerText = "Submit response";
+            }
+        });
 
-        // ==========================================================
-        // STARTUP ROUTING
-        // ==========================================================
         fpPromise.then(fp => fp.get()).then(async (result) => {
             const fingerprint = result.visitorId;
-
-            // User already submitted on this browser? Go straight to success (No welcome animation).
             if (localSubmitted) {
                 showSuccessScreen(localRank);
                 return;
             }
-
-            // Check Firebase for past submission
             try {
                 const docRef = doc(db, "submissions", fingerprint);
                 const docSnap = await getDoc(docRef);
-                
                 if (docSnap.exists()) {
                     let legacyRank = docSnap.data().participantNumber || "an early";
-                    try {
-                        localStorage.setItem("satyajit_official_submitted", "true");
-                        localStorage.setItem("satyajit_locked_rank", legacyRank);
-                    } catch(e) {}
-                    
-                    // Go straight to success screen (No welcome animation)
+                    localStorage.setItem("satyajit_official_submitted", "true");
+                    localStorage.setItem("satyajit_locked_rank", legacyRank);
                     showSuccessScreen(legacyRank);
-                    return;
                 }
-            } catch(e) { console.warn("Firebase legacy check failed."); }
-
-            // BRAND NEW USER DETECTED - Play the animation!
-            playWelcomeAnimation(() => {
-                header.classList.remove('hidden');
-                form.classList.remove('hidden');
-                attachSubmitLogic();
-            });
-
-        }).catch(err => {
-            // Failsafe for adblockers
-            if (localSubmitted) {
-                showSuccessScreen(localRank);
-            } else {
-                playWelcomeAnimation(() => {
-                    header.classList.remove('hidden');
-                    form.classList.remove('hidden');
-                    attachSubmitLogic();
-                });
-            }
+            } catch(e) {}
         });
     </script>
 </body>
