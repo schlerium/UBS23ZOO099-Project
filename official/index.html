@@ -29,8 +29,8 @@
             <div class="mt-8 flex flex-col items-center">
                 <div class="w-full max-w-sm relative">
                     <div id="slider-tooltip-header" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-white transition-all duration-300">0</div>
-                    <input type="range" min="0" max="50" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-header">
-                    <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>50</span></div>
+                    <input type="range" min="0" max="60" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-header">
+                    <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>60</span></div>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
 
             <div class="w-full max-w-sm relative mt-4">
                 <div id="slider-tooltip-status" class="absolute -top-8 left-0 transform -translate-x-1/2 border-2 border-black rounded-full px-2 py-0.5 text-sm font-bold bg-white transition-all duration-300">0</div>
-                <input type="range" min="0" max="50" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-status">
+                <input type="range" min="0" max="60" value="0" class="w-full appearance-none h-1.5 bg-gray-300 rounded-full outline-none pointer-events-none" id="progress-slider-status">
                 <div class="flex justify-between text-sm font-bold mt-2 px-1 text-gray-600"><span>0</span><span>50</span></div>
             </div>
 
@@ -409,11 +409,11 @@
             counterDisplay.innerText = count;
             sliderHeader.value = count;
             tooltipHeader.innerText = count;
-            const pHead = (count / 50) * 100;
+            const pHead = (count / 60) * 100;
             tooltipHeader.style.left = `calc(${pHead}% + (${8 - pHead * 0.15}px))`;
             sliderStatus.value = count;
             tooltipStatus.innerText = count;
-            const pStat = (count / 50) * 100;
+            const pStat = (count / 60) * 100;
             tooltipStatus.style.left = `calc(${pStat}% + (${8 - pStat * 0.15}px))`;
         });
 
